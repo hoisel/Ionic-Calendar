@@ -39,9 +39,6 @@
 			<ion-view view-title={{vm.viewTitle}}>
 				<ion-nav-buttons side="right">
 					<button class="button" ng-disabled="vm.isToday()" ng-click="vm.today()">Today</button>
-					<button class="button" ng-click="vm.changeMode('month')">M</button>
-					<button class="button" ng-click="vm.changeMode('week')">W</button>
-					<button class="button" ng-click="vm.changeMode('day')">D</button>
 					<button class="button" ng-click="vm.loadEvents()">Load Events</button>
 				</ion-nav-buttons>
 

@@ -1,13 +1,11 @@
-
 angular.module( 'calendarDemoApp', [ 'ionic', 'ngAnimate', 'ui.rCalendar' ] );
+angular.module( 'calendarDemoApp' ).controller( 'CalendarDemoController', CalendarDemoController );
+angular.module( 'calendarDemoApp' ).config( appConfig );
+angular.module( 'calendarDemoApp' ).run( appRun );
 
 appRun.$inject = [ '$ionicPlatform', '$animate' ];
 appConfig.$inject = [ '$stateProvider', '$urlRouterProvider' ];
 CalendarDemoController.$inject = [ '$log' ];
-
-angular.module( 'calendarDemoApp' ).controller( 'CalendarDemoController', CalendarDemoController );
-angular.module( 'calendarDemoApp' ).config( appConfig );
-angular.module( 'calendarDemoApp' ).run( appRun );
 
 function appRun( $ionicPlatform, $animate ) {
     'use strict';
@@ -57,9 +55,6 @@ function CalendarDemoController( $log ) {
     var vm = this;
 
     vm.calendar = {};
-    vm.changeMode = function( mode ) {
-        vm.calendar.mode = mode;
-    };
 
     vm.loadEvents = function() {
         vm.calendar.eventSource = createRandomEvents();
