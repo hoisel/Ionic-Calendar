@@ -8,8 +8,8 @@ angular.module( 'ui.rCalendar' ).constant( 'calendarConfig', {
     showEventDetail: true,
     startingDayMonth: 0,
     startingDayWeek: 0,
-    allDayLabel: 'all day',
-    noEventsLabel: 'No Events',
+    allDayLabel: 'O dia todo',
+    noEventsLabel: 'Nenhum evento encontrado',
     eventSource: null,
     queryMode: 'local',
     step: 60
