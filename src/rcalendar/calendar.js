@@ -33,7 +33,6 @@ angular.module( 'ui.rCalendar' ).directive( 'calendar', function calendarDirecti
         }
     };
 } );
-angular.module( 'ui.rCalendar' ).directive( 'monthview', monthviewDirective );
 angular.module( 'ui.rCalendar' ).constant( 'calendarConfig', {
     formatDay: 'dd',
     formatDayHeader: 'EEE',
@@ -595,14 +594,4 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
             return ( event1.startTime.getTime() - event2.startTime.getTime() );
         }
     }
-}
-
-function monthviewDirective() {
-    'use strict';
-    return {
-        restrict: 'EA',
-        replace: true,
-        templateUrl: 'templates/rcalendar/month.html',
-        require: [ '^calendar', '?^ngModel' ]
-    };
 }
