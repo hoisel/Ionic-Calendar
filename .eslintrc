@@ -1,0 +1,3 @@
+{
+  "extends": ["prodest/es5","prodest-angular"]
+}
