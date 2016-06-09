@@ -13,7 +13,7 @@ module.exports = function( grunt ) {
                 configFile: '.eslintrc',
                 fix: true
             },
-            target: [ 'gruntfile.js', 'demo/calendarDemoCtrl.js', 'src/**/*.js' ]
+            target: [ 'gruntfile.js', 'www/calendarDemoCtrl.js', 'src/**/*.js' ]
         },
         html2js: {
             dist_tpls: {
@@ -34,7 +34,7 @@ module.exports = function( grunt ) {
         'string-replace': {
             dist_tpls: {
                 files: {
-                    'build/': 'src/rcalendar/calendar.js'
+                    'build/': 'src/calendar.js'
                 },
                 options: {
                     replacements: [
@@ -52,8 +52,8 @@ module.exports = function( grunt ) {
                     {
                         expand: true,
                         src: [ '*.css' ],
-                        cwd: 'css/rcalendar',
-                        dest: 'dist/css'
+                        cwd: 'src/',
+                        dest: 'www/dist/css'
                     }
                 ]
             }
@@ -66,7 +66,7 @@ module.exports = function( grunt ) {
                 src: [
                     'build/src/**/calendar.js', 'build/templates/**/*.html.js'
                 ],
-                dest: 'dist/js/calendar-tpls.js'
+                dest: 'www/dist/js/calendar-tpls.js'
             }
         },
         uglify: {
@@ -74,19 +74,19 @@ module.exports = function( grunt ) {
                 options: {
                     mangle: false
                 },
-                src: [ 'dist/js/calendar-tpls.js' ],
-                dest: 'dist/js/calendar-tpls.min.js'
+                src: [ 'www/dist/js/calendar-tpls.js' ],
+                dest: 'www/dist/js/calendar-tpls.min.js'
             },
             dist: {
-                src: [ 'src/rcalendar/calendar.js' ],
-                dest: 'dist/js/calendar.min.js'
+                src: [ 'src/calendar.js' ],
+                dest: 'www/dist/js/calendar.min.js'
             }
         },
         cssmin: {
             dist: {
                 files: [
                     {
-                        'dist/css/calendar.min.css': [ 'css/**/*.css' ]
+                        'www/dist/css/calendar.min.css': [ 'css/**/*.css' ]
                     }
                 ]
             }
