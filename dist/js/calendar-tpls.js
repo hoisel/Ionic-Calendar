@@ -37,7 +37,6 @@ angular.module( 'ui.rCalendar' ).directive( 'calendar', function calendarDirecti
 angular.module( 'ui.rCalendar' ).constant( 'calendarConfig', {
     formatDay: 'dd',
     formatDayHeader: 'EEE',
-    formatDayTitle: 'MMMM dd, yyyy',
     formatMonthTitle: 'MMMM yyyy',
     formatHourColumn: 'ha',
     showEventDetail: true,
@@ -72,7 +71,6 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     angular.forEach( [
         'formatDay',
         'formatDayHeader',
-        'formatDayTitle',
         'formatMonthTitle',
         'formatHourColumn',
         'allDayLabel',
@@ -84,7 +82,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         'startingDayMonth',
         'startingDayWeek'
     ], function( key, index ) {
-        vm[ key ] = angular.isDefined( $attrs[ key ] ) ? ( index < 7 ? $interpolate( $attrs[ key ] )( $scope.$parent ) : $scope.$parent.$eval( $attrs[ key ] ) ) : calendarConfig[ key ];
+        vm[ key ] = angular.isDefined( $attrs[ key ] ) ? ( index < 6 ? $interpolate( $attrs[ key ] )( $scope.$parent ) : $scope.$parent.$eval( $attrs[ key ] ) ) : calendarConfig[ key ];
     } );
 
     vm.mode = {
