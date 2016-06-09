@@ -4,11 +4,8 @@ angular.module( 'ui.rCalendar' ).constant( 'calendarConfig', {
     formatDay: 'dd',
     formatDayHeader: 'EEE',
     formatDayTitle: 'MMMM dd, yyyy',
-    formatWeekTitle: 'MMMM yyyy, Week w',
     formatMonthTitle: 'MMMM yyyy',
-    formatWeekViewDayHeader: 'EEE d',
     formatHourColumn: 'ha',
-    calendarMode: 'month',
     showEventDetail: true,
     startingDayMonth: 0,
     startingDayWeek: 0,
@@ -43,9 +40,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         'formatDay',
         'formatDayHeader',
         'formatDayTitle',
-        'formatWeekTitle',
         'formatMonthTitle',
-        'formatWeekViewDayHeader',
         'formatHourColumn',
         'allDayLabel',
         'noEventsLabel',
@@ -56,7 +51,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         'startingDayMonth',
         'startingDayWeek'
     ], function( key, index ) {
-        vm[ key ] = angular.isDefined( $attrs[ key ] ) ? ( index < 9 ? $interpolate( $attrs[ key ] )( $scope.$parent ) : $scope.$parent.$eval( $attrs[ key ] ) ) : calendarConfig[ key ];
+        vm[ key ] = angular.isDefined( $attrs[ key ] ) ? ( index < 7 ? $interpolate( $attrs[ key ] )( $scope.$parent ) : $scope.$parent.$eval( $attrs[ key ] ) ) : calendarConfig[ key ];
     } );
 
     vm.hourParts = 1;
@@ -70,7 +65,6 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         vm.onEventSourceChanged( value );
     } );
 
-    vm.calendarMode = vm.calendarMode || calendarConfig.calendarMode;
     if ( angular.isDefined( $attrs.initDate ) ) {
         vm.currentCalendarDate = $scope.$parent.$eval( $attrs.initDate );
     }
@@ -90,12 +84,12 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         var firstDayInNextMonth;
 
         calculateCalendarDate.setFullYear( year, month, date );
-        if ( vm.calendarMode === 'month' ) {
-            firstDayInNextMonth = new Date( year, month + 1, 1 );
-            if ( firstDayInNextMonth.getTime() <= calculateCalendarDate.getTime() ) {
-                calculateCalendarDate = new Date( firstDayInNextMonth - 24 * 60 * 60 * 1000 );
-            }
+
+        firstDayInNextMonth = new Date( year, month + 1, 1 );
+        if ( firstDayInNextMonth.getTime() <= calculateCalendarDate.getTime() ) {
+            calculateCalendarDate = new Date( firstDayInNextMonth - 24 * 60 * 60 * 1000 );
         }
+
         return calculateCalendarDate;
     }
 
@@ -246,7 +240,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     };
 
     vm.slideView = function( direction ) {
-        var slideHandle = $ionicSlideBoxDelegate.$getByHandle( vm.calendarMode + 'view-slide' );
+        var slideHandle = $ionicSlideBoxDelegate.$getByHandle( 'monthview-slide' );
 
         if ( slideHandle ) {
             if ( direction === 1 ) {
@@ -265,7 +259,6 @@ angular.module( 'ui.rCalendar' ).directive( 'calendar', function calendarDirecti
         replace: true,
         templateUrl: 'templates/rcalendar/calendar.html',
         scope: {
-            calendarMode: '=',
             rangeChanged: '&',
             eventSelected: '&',
             timeSelected: '&',
