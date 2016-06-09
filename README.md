@@ -3,7 +3,7 @@
 Ionic calendar directive
 
 # Demo
-http://twinssbc.github.io/Ionic-Calendar/demo/
+http://hoisel.github.io/Ionic-Calendar/demo/
 
 # Usage
 
