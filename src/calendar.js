@@ -502,10 +502,10 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
                     // add sources
                     date.eventSources = date.eventSources || {};
                     date.eventSources[ eventSource.etag ] = date.eventSources[ eventSource.etag ] || {
-                            summary: eventSource.summary,
-                            color: eventSource.color,
-                            etag: eventSource.etag
-                        };
+                        summary: eventSource.summary,
+                        color: eventSource.color,
+                        etag: eventSource.etag
+                    };
                     index += 1;
                 }
             }

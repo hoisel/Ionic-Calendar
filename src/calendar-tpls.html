@@ -311,6 +311,7 @@
 					 ng-show="vm.showEventDetail"
 					 overflow-scroll="false">
 			<!--<h3>{{vm.selectedDate.events.length}}</h3>-->
+
 			<table class="table table-bordered table-striped table-fixed event-detail-table">
 				<tr ng-repeat="event in vm.selectedDate.events track by event.etag"
 					ng-click="vm.eventSelected({event:event})">
@@ -320,9 +321,10 @@
 						-
 						{{::event.formatedEndTime}}
 					</td>
-					<td ng-if="event.allDay" class="monthview-eventdetail-timecolumn">All day</td>
+					<td ng-if="event.allDay" class="monthview-eventdetail-timecolumn">O dia todo</td>
 					<td class="event-detail">{{::event.summary}}</td>
 				</tr>
+
 				<tr ng-if="!vm.selectedDate.events">
 					<td class="no-event-label" ng-bind="::noEventsLabel"></td>
 				</tr>

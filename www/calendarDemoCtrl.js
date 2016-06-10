@@ -81,7 +81,7 @@ function CalendarDemoController( $log ) {
 
         eventSources.forEach( function( source ) {
             source.color = colors[ Math.floor( Math.random() * ( ( colors.length - 1 ) - 0 + 1 ) ) ];
-            source.items = createRandomEvents( source.summary, Math.floor( Math.random() * 500 ), source.color );
+            source.items = createRandomEvents( source.summary, Math.floor( Math.random() * 50 ), source.color );
             source.etag = guid();
 
             numberOfEvents += source.items.length;
@@ -155,7 +155,7 @@ function CalendarDemoController( $log ) {
                 }
                 endTime = new Date( Date.UTC( date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + endDay ) );
                 events.push( {
-                    summary: 'All Day - ' + i,
+                    summary: source + ' - Event ' + i,
                     startTime: startTime,
                     endTime: endTime,
                     allDay: true,
