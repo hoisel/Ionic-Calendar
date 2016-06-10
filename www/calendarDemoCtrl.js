@@ -52,12 +52,45 @@ function appConfig( $stateProvider, $urlRouterProvider ) {
 function CalendarDemoController( $log ) {
     'use strict';
 
+    var numberOfEvents;
+    var i;
     var vm = this;
+    var eventSources;
+    var colors = new Array( 100 );
+
+    for ( i = 0; i < colors.length; i += 1 ) {
+        colors[ i ] = '#' + ( Math.random() * 0xFFFFFF << 0 ).toString( 16 );
+    }
 
     vm.calendar = {};
 
     vm.loadEvents = function() {
-        vm.calendar.eventSource = createRandomEvents();
+        numberOfEvents = 0;
+
+        eventSources = [
+            { summary: 'SEFAZ' },
+            { summary: 'SEGER' },
+            { summary: 'SEJUS' },
+            { summary: 'PRODEST' },
+            { summary: 'SECONT' },
+            { summary: 'SECULT' },
+            { summary: 'SEDU' },
+            { summary: 'SESA' },
+            { summary: 'SESP' }
+        ];
+
+        eventSources.forEach( function( source ) {
+            source.color = colors[ Math.floor( Math.random() * ( ( colors.length - 1 ) - 0 + 1 ) ) ];
+            source.items = createRandomEvents( source.summary, Math.floor( Math.random() * 50 ), source.color );
+            source.etag = guid();
+
+            numberOfEvents += source.items.length;
+        } );
+
+        $log.info( 'numberOfEvents:', numberOfEvents );
+
+        vm.calendar.eventSources = eventSources;
+
     };
 
     vm.onEventSelected = function( event ) {
@@ -85,7 +118,19 @@ function CalendarDemoController( $log ) {
         $log.info( 'Selected time: ' + selectedTime );
     };
 
-    function createRandomEvents() {
+    ///////////////////////////////////////////////////////////////////////
+
+    function guid() {
+        function s4() {
+            return Math.floor( ( 1 + Math.random() ) * 0x10000 )
+                       .toString( 16 )
+                       .substring( 1 );
+        }
+
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+    }
+
+    function createRandomEvents( source, numOfEvents, color ) {
         var events = [];
         var date;
         var eventType;
@@ -97,7 +142,7 @@ function CalendarDemoController( $log ) {
         var startMinute;
         var endMinute;
 
-        for ( i = 0; i < 50; i += 1 ) {
+        for ( i = 0; i < numOfEvents; i += 1 ) {
             date = new Date();
             eventType = Math.floor( Math.random() * 2 );
             startDay = Math.floor( Math.random() * 90 ) - 45;
@@ -110,10 +155,12 @@ function CalendarDemoController( $log ) {
                 }
                 endTime = new Date( Date.UTC( date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + endDay ) );
                 events.push( {
-                    title: 'All Day - ' + i,
+                    summary: source + ' - Event ' + i,
                     startTime: startTime,
                     endTime: endTime,
-                    allDay: true
+                    allDay: true,
+                    color: color,
+                    etag: guid()
                 } );
             } else {
                 startMinute = Math.floor( Math.random() * 24 * 60 );
@@ -121,10 +168,13 @@ function CalendarDemoController( $log ) {
                 startTime = new Date( date.getFullYear(), date.getMonth(), date.getDate() + startDay, 0, date.getMinutes() + startMinute );
                 endTime = new Date( date.getFullYear(), date.getMonth(), date.getDate() + endDay, 0, date.getMinutes() + endMinute );
                 events.push( {
-                    title: 'Event - ' + i,
+                    id: guid(),
+                    etag: guid(),
+                    summary: source + ' - Event ' + i,
                     startTime: startTime,
                     endTime: endTime,
-                    allDay: false
+                    allDay: false,
+                    color: color
                 } );
             }
         }
