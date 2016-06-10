@@ -1,3 +1,6 @@
+//todo: renomear eventos: titleChanged -> monthChanged  | timeSelected -> dateSelected
+//todo: aplicar tema material
+
 angular.module( 'ui.rCalendar', [] );
 angular.module( 'ui.rCalendar' ).directive( 'calendar', function calendarDirective() {
     'use strict';
