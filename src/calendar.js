@@ -37,15 +37,14 @@ angular.module( 'ui.rCalendar' ).constant( 'calendarConfig', {
     formatDay: 'dd',
     formatDayHeader: 'EEE',
     formatMonthTitle: 'MMMM yyyy',
-    formatHourColumn: 'ha',
+    formatHourColumn: 'HH:mm',
     showEventDetail: true,
     startingDayMonth: 0,
     startingDayWeek: 0,
     allDayLabel: 'O dia todo',
     noEventsLabel: 'Nenhum evento encontrado',
-    eventSource: null,
-    queryMode: 'local',
-    step: 60
+    eventSources: null,
+    queryMode: 'local'
 } );
 angular.module( 'ui.rCalendar' ).controller( 'ui.rCalendar.CalendarController', CalendarController );
 
@@ -75,7 +74,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         'allDayLabel',
         'noEventsLabel',
         'showEventDetail',
-        'eventSource',
+        'eventSources',
         'queryMode',
         'step',
         'startingDayMonth',
@@ -88,14 +87,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         step: { months: 1 }
     };
 
-    vm.hourParts = 1;
-    if ( vm.step === 60 || vm.step === 30 || vm.step === 15 ) {
-        vm.hourParts = Math.floor( 60 / vm.step );
-    } else {
-        throw new Error( 'Invalid step parameter: ' + vm.step );
-    }
-
-    $scope.$parent.$watch( $attrs.eventSource, function( value ) {
+    $scope.$parent.$watch( $attrs.eventSources, function( value ) {
         vm.onEventSourceChanged( value );
     } );
 
@@ -157,7 +149,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     };
 
     vm.onEventSourceChanged = function( value ) {
-        vm.eventSource = value;
+        vm.eventSources = value;
         if ( onDataLoaded ) {
             onDataLoaded();
         }
@@ -182,7 +174,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
 
     vm.rangeChanged = function() {
         if ( vm.queryMode === 'local' ) {
-            if ( vm.eventSource && onDataLoaded ) {
+            if ( vm.eventSources && onDataLoaded ) {
                 onDataLoaded();
             }
         } else if ( vm.queryMode === 'remote' ) {
@@ -382,9 +374,9 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     function getAdjacentCalendarDate( currentCalendarDate, direction ) {
         var step = vm.mode.step;
         var calculateCalendarDate = new Date( currentCalendarDate );
-        var year = calculateCalendarDate.getFullYear() + direction * ( step.years || 0 );
+        var year = calculateCalendarDate.getFullYear();
         var month = calculateCalendarDate.getMonth() + direction * ( step.months || 0 );
-        var date = calculateCalendarDate.getDate() + direction * ( step.days || 0 );
+        var date = 1; //calculateCalendarDate.getDate(); mantem o dia selecionado
         var firstDayInNextMonth;
 
         calculateCalendarDate.setFullYear( year, month, date );
@@ -393,7 +385,6 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         if ( firstDayInNextMonth.getTime() <= calculateCalendarDate.getTime() ) {
             calculateCalendarDate = new Date( firstDayInNextMonth - 24 * 60 * 60 * 1000 );
         }
-
         return calculateCalendarDate;
     }
 
@@ -416,8 +407,10 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     }
 
     function onDataLoaded() {
-        var eventSource = vm.eventSource;
-        var len = eventSource ? eventSource.length : 0;
+        var eventSources = vm.eventSources;
+        var eventSource;
+        var sourceLength = eventSources ? eventSources.length : 0;
+        var eventsLength;
         var startTime = vm.range.startTime;
         var endTime = vm.range.endTime;
         var timeZoneOffset = -new Date().getTimezoneOffset();
@@ -425,10 +418,12 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         var utcEndTime = new Date( endTime.getTime() + timeZoneOffset * 60 * 1000 );
         var currentViewIndex = vm.currentViewIndex;
         var dates = vm.views[ currentViewIndex ].dates;
+        var date;
         var oneDay = 86400000;
         var eps = 0.001;
         var r;
         var i;
+        var s;
         var event;
         var eventStartTime;
         var eventEndTime;
@@ -437,61 +432,76 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         var timeDifferenceStart;
         var timeDifferenceEnd;
         var index;
-        var eventSet;
         var findSelected;
 
         for ( r = 0; r < 42; r += 1 ) {
-            if ( dates[ r ].hasEvent ) {
-                dates[ r ].hasEvent = false;
-                dates[ r ].events = [];
+            date = dates[ r ];
+            if ( date.hasEvent ) {
+                date.hasEvent = false;
+                date.events = [];
+                date.eventSources = {};
             }
         }
 
-        for ( i = 0; i < len; i += 1 ) {
-            event = eventSource[ i ];
-            eventStartTime = new Date( event.startTime );
-            eventEndTime = new Date( event.endTime );
-            if ( event.allDay ) {
-                if ( eventEndTime <= utcStartTime || eventStartTime >= utcEndTime ) {
-                    continue;
+        for ( s = 0; s < sourceLength; s += 1 ) {
+            eventSource = eventSources[ s ];
+            eventsLength = ( eventSource && eventSource.items ) ? eventSource.items.length : 0;
+
+            for ( i = 0; i < eventsLength; i += 1 ) {
+                event = eventSource.items[ i ];
+                eventStartTime = new Date( event.startTime );
+                eventEndTime = new Date( event.endTime );
+
+                if ( event.allDay ) {
+                    if ( eventEndTime <= utcStartTime || eventStartTime >= utcEndTime ) {
+                        continue;
+                    } else {
+                        st = utcStartTime;
+                        et = utcEndTime;
+                    }
                 } else {
-                    st = utcStartTime;
-                    et = utcEndTime;
+                    if ( eventEndTime <= startTime || eventStartTime >= endTime ) {
+                        continue;
+                    } else {
+                        st = startTime;
+                        et = endTime;
+                    }
                 }
-            } else {
-                if ( eventEndTime <= startTime || eventStartTime >= endTime ) {
-                    continue;
+
+                event.formatedStartTime = dateFilter( eventStartTime, vm.formatHourColumn );
+                event.formatedEndTime = dateFilter( eventEndTime, vm.formatHourColumn );
+
+                if ( eventStartTime <= st ) {
+                    timeDifferenceStart = 0;
                 } else {
-                    st = startTime;
-                    et = endTime;
+                    timeDifferenceStart = ( eventStartTime - st ) / oneDay;
                 }
-            }
 
-            if ( eventStartTime <= st ) {
-                timeDifferenceStart = 0;
-            } else {
-                timeDifferenceStart = ( eventStartTime - st ) / oneDay;
-            }
-
-            if ( eventEndTime >= et ) {
-                timeDifferenceEnd = ( et - st ) / oneDay;
-            } else {
-                timeDifferenceEnd = ( eventEndTime - st ) / oneDay;
-            }
-
-            index = Math.floor( timeDifferenceStart );
-
-            while ( index < timeDifferenceEnd - eps ) {
-                dates[ index ].hasEvent = true;
-                eventSet = dates[ index ].events;
-                if ( eventSet ) {
-                    eventSet.push( event );
+                if ( eventEndTime >= et ) {
+                    timeDifferenceEnd = ( et - st ) / oneDay;
                 } else {
-                    eventSet = [];
-                    eventSet.push( event );
-                    dates[ index ].events = eventSet;
+                    timeDifferenceEnd = ( eventEndTime - st ) / oneDay;
                 }
-                index += 1;
+
+                index = Math.floor( timeDifferenceStart );
+
+                while ( index < timeDifferenceEnd - eps ) {
+                    date = dates[ index ];
+                    date.hasEvent = true;
+
+                    // add sources
+                    date.events = date.events || [];
+                    date.events.push( event );
+
+                    // add sources
+                    date.eventSources = date.eventSources || {};
+                    date.eventSources[ eventSource.etag ] = date.eventSources[ eventSource.etag ] || {
+                        summary: eventSource.summary,
+                        color: eventSource.color,
+                        etag: eventSource.etag
+                    };
+                    index += 1;
+                }
             }
         }
 
@@ -553,7 +563,8 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     function createDateObject( date, format ) {
         return {
             date: date,
-            label: dateFilter( date, format )
+            label: dateFilter( date, format ),
+            formatedDayHeader: dateFilter( date, vm.formatDayHeader )
         };
     }
 
@@ -593,3 +604,18 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         }
     }
 }
+
+angular.module( 'ui.rCalendar' ).directive( 'day', function monthDayDirective() {
+    'use strict';
+    return {
+        restrict: 'A',
+        replace: true,
+        templateUrl: 'src/month-day-tpls.html',
+        scope: {
+            day: '=',
+            onSelect: '&',
+            getClasses: '&'
+        }
+    };
+} );
+
