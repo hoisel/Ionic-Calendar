@@ -4,7 +4,7 @@ angular.module( 'ui.rCalendar' ).directive( 'calendar', function calendarDirecti
     return {
         restrict: 'EA',
         replace: true,
-        templateUrl: 'templates/rcalendar/calendar.html',
+        templateUrl: 'src/calendar-tpls.html',
         bindToController: true,
         controllerAs: 'vm',
         scope: {

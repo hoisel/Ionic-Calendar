@@ -1,11 +1,11 @@
-angular.module( "ui.rCalendar.tpls", [ "templates/rcalendar/calendar.html" ] );
+angular.module( "ui.rCalendar.tpls", [ "src/calendar-tpls.html" ] );
 angular.module( 'ui.rCalendar', [ 'ui.rCalendar.tpls' ] );
 angular.module( 'ui.rCalendar' ).directive( 'calendar', function calendarDirective() {
     'use strict';
     return {
         restrict: 'EA',
         replace: true,
-        templateUrl: 'templates/rcalendar/calendar.html',
+        templateUrl: 'src/calendar-tpls.html',
         bindToController: true,
         controllerAs: 'vm',
         scope: {
@@ -595,8 +595,8 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     }
 }
 
-angular.module("templates/rcalendar/calendar.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("templates/rcalendar/calendar.html",
+angular.module("src/calendar-tpls.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("src/calendar-tpls.html",
     "<div class=\"calendar-container\">\n" +
     "	<div>\n" +
     "		<ion-slide-box class=\"monthview-slide\"\n" +

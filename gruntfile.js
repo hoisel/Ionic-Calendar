@@ -24,7 +24,7 @@ module.exports = function( grunt ) {
                 files: [
                     {
                         expand: true,
-                        src: [ 'templates/**/*.html' ],
+                        src: [ 'src/**/*.html' ],
                         dest: 'build',
                         ext: '.html.js'
                     }
@@ -61,10 +61,10 @@ module.exports = function( grunt ) {
         concat: {
             dist_tpls: {
                 options: {
-                    banner: 'angular.module( "ui.rCalendar.tpls", [ ' + grunt.file.expand( 'templates/**/*.html' ).map( enquote ) + ' ] );\n'
+                    banner: 'angular.module( "ui.rCalendar.tpls", [ ' + grunt.file.expand( 'src/**/*.html' ).map( enquote ) + ' ] );\n'
                 },
                 src: [
-                    'build/src/**/calendar.js', 'build/templates/**/*.html.js'
+                    'build/src/**/calendar.js', 'build/src/**/*.html.js'
                 ],
                 dest: 'www/dist/js/calendar-tpls.js'
             }
