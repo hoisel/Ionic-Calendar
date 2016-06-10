@@ -432,7 +432,6 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         var timeDifferenceStart;
         var timeDifferenceEnd;
         var index;
-        var eventSet;
         var findSelected;
 
         for ( r = 0; r < 42; r += 1 ) {
@@ -490,14 +489,9 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
                     date = dates[ index ];
                     date.hasEvent = true;
 
-                    eventSet = date.events;
-                    if ( eventSet ) {
-                        eventSet.push( event );
-                    } else {
-                        eventSet = [];
-                        eventSet.push( event );
-                        date.events = eventSet;
-                    }
+                    // add sources
+                    date.events = date.events || [];
+                    date.events.push( event );
 
                     // add sources
                     date.eventSources = date.eventSources || {};
