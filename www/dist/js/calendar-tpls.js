@@ -1,4 +1,4 @@
-angular.module( "ui.rCalendar.tpls", [ "src/calendar-tpls.html" ] );
+angular.module( "ui.rCalendar.tpls", [ "src/calendar-tpls.html","src/month-day-tpls.html" ] );
 angular.module( 'ui.rCalendar', [ 'ui.rCalendar.tpls' ] );
 angular.module( 'ui.rCalendar' ).directive( 'calendar', function calendarDirective() {
     'use strict';
@@ -38,15 +38,14 @@ angular.module( 'ui.rCalendar' ).constant( 'calendarConfig', {
     formatDay: 'dd',
     formatDayHeader: 'EEE',
     formatMonthTitle: 'MMMM yyyy',
-    formatHourColumn: 'ha',
+    formatHourColumn: 'HH:mm',
     showEventDetail: true,
     startingDayMonth: 0,
     startingDayWeek: 0,
     allDayLabel: 'O dia todo',
     noEventsLabel: 'Nenhum evento encontrado',
-    eventSource: null,
-    queryMode: 'local',
-    step: 60
+    eventSources: null,
+    queryMode: 'local'
 } );
 angular.module( 'ui.rCalendar' ).controller( 'ui.rCalendar.CalendarController', CalendarController );
 
@@ -76,7 +75,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         'allDayLabel',
         'noEventsLabel',
         'showEventDetail',
-        'eventSource',
+        'eventSources',
         'queryMode',
         'step',
         'startingDayMonth',
@@ -89,14 +88,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         step: { months: 1 }
     };
 
-    vm.hourParts = 1;
-    if ( vm.step === 60 || vm.step === 30 || vm.step === 15 ) {
-        vm.hourParts = Math.floor( 60 / vm.step );
-    } else {
-        throw new Error( 'Invalid step parameter: ' + vm.step );
-    }
-
-    $scope.$parent.$watch( $attrs.eventSource, function( value ) {
+    $scope.$parent.$watch( $attrs.eventSources, function( value ) {
         vm.onEventSourceChanged( value );
     } );
 
@@ -158,7 +150,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     };
 
     vm.onEventSourceChanged = function( value ) {
-        vm.eventSource = value;
+        vm.eventSources = value;
         if ( onDataLoaded ) {
             onDataLoaded();
         }
@@ -183,7 +175,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
 
     vm.rangeChanged = function() {
         if ( vm.queryMode === 'local' ) {
-            if ( vm.eventSource && onDataLoaded ) {
+            if ( vm.eventSources && onDataLoaded ) {
                 onDataLoaded();
             }
         } else if ( vm.queryMode === 'remote' ) {
@@ -383,9 +375,9 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     function getAdjacentCalendarDate( currentCalendarDate, direction ) {
         var step = vm.mode.step;
         var calculateCalendarDate = new Date( currentCalendarDate );
-        var year = calculateCalendarDate.getFullYear() + direction * ( step.years || 0 );
+        var year = calculateCalendarDate.getFullYear();
         var month = calculateCalendarDate.getMonth() + direction * ( step.months || 0 );
-        var date = calculateCalendarDate.getDate() + direction * ( step.days || 0 );
+        var date = 1; //calculateCalendarDate.getDate(); mantem o dia selecionado
         var firstDayInNextMonth;
 
         calculateCalendarDate.setFullYear( year, month, date );
@@ -394,7 +386,6 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         if ( firstDayInNextMonth.getTime() <= calculateCalendarDate.getTime() ) {
             calculateCalendarDate = new Date( firstDayInNextMonth - 24 * 60 * 60 * 1000 );
         }
-
         return calculateCalendarDate;
     }
 
@@ -417,8 +408,10 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     }
 
     function onDataLoaded() {
-        var eventSource = vm.eventSource;
-        var len = eventSource ? eventSource.length : 0;
+        var eventSources = vm.eventSources;
+        var eventSource;
+        var sourceLength = eventSources ? eventSources.length : 0;
+        var eventsLength;
         var startTime = vm.range.startTime;
         var endTime = vm.range.endTime;
         var timeZoneOffset = -new Date().getTimezoneOffset();
@@ -426,10 +419,12 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         var utcEndTime = new Date( endTime.getTime() + timeZoneOffset * 60 * 1000 );
         var currentViewIndex = vm.currentViewIndex;
         var dates = vm.views[ currentViewIndex ].dates;
+        var date;
         var oneDay = 86400000;
         var eps = 0.001;
         var r;
         var i;
+        var s;
         var event;
         var eventStartTime;
         var eventEndTime;
@@ -438,61 +433,76 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         var timeDifferenceStart;
         var timeDifferenceEnd;
         var index;
-        var eventSet;
         var findSelected;
 
         for ( r = 0; r < 42; r += 1 ) {
-            if ( dates[ r ].hasEvent ) {
-                dates[ r ].hasEvent = false;
-                dates[ r ].events = [];
+            date = dates[ r ];
+            if ( date.hasEvent ) {
+                date.hasEvent = false;
+                date.events = [];
+                date.eventSources = {};
             }
         }
 
-        for ( i = 0; i < len; i += 1 ) {
-            event = eventSource[ i ];
-            eventStartTime = new Date( event.startTime );
-            eventEndTime = new Date( event.endTime );
-            if ( event.allDay ) {
-                if ( eventEndTime <= utcStartTime || eventStartTime >= utcEndTime ) {
-                    continue;
+        for ( s = 0; s < sourceLength; s += 1 ) {
+            eventSource = eventSources[ s ];
+            eventsLength = ( eventSource && eventSource.items ) ? eventSource.items.length : 0;
+
+            for ( i = 0; i < eventsLength; i += 1 ) {
+                event = eventSource.items[ i ];
+                eventStartTime = new Date( event.startTime );
+                eventEndTime = new Date( event.endTime );
+
+                if ( event.allDay ) {
+                    if ( eventEndTime <= utcStartTime || eventStartTime >= utcEndTime ) {
+                        continue;
+                    } else {
+                        st = utcStartTime;
+                        et = utcEndTime;
+                    }
                 } else {
-                    st = utcStartTime;
-                    et = utcEndTime;
+                    if ( eventEndTime <= startTime || eventStartTime >= endTime ) {
+                        continue;
+                    } else {
+                        st = startTime;
+                        et = endTime;
+                    }
                 }
-            } else {
-                if ( eventEndTime <= startTime || eventStartTime >= endTime ) {
-                    continue;
+
+                event.formatedStartTime = dateFilter( eventStartTime, vm.formatHourColumn );
+                event.formatedEndTime = dateFilter( eventEndTime, vm.formatHourColumn );
+
+                if ( eventStartTime <= st ) {
+                    timeDifferenceStart = 0;
                 } else {
-                    st = startTime;
-                    et = endTime;
+                    timeDifferenceStart = ( eventStartTime - st ) / oneDay;
                 }
-            }
 
-            if ( eventStartTime <= st ) {
-                timeDifferenceStart = 0;
-            } else {
-                timeDifferenceStart = ( eventStartTime - st ) / oneDay;
-            }
-
-            if ( eventEndTime >= et ) {
-                timeDifferenceEnd = ( et - st ) / oneDay;
-            } else {
-                timeDifferenceEnd = ( eventEndTime - st ) / oneDay;
-            }
-
-            index = Math.floor( timeDifferenceStart );
-
-            while ( index < timeDifferenceEnd - eps ) {
-                dates[ index ].hasEvent = true;
-                eventSet = dates[ index ].events;
-                if ( eventSet ) {
-                    eventSet.push( event );
+                if ( eventEndTime >= et ) {
+                    timeDifferenceEnd = ( et - st ) / oneDay;
                 } else {
-                    eventSet = [];
-                    eventSet.push( event );
-                    dates[ index ].events = eventSet;
+                    timeDifferenceEnd = ( eventEndTime - st ) / oneDay;
                 }
-                index += 1;
+
+                index = Math.floor( timeDifferenceStart );
+
+                while ( index < timeDifferenceEnd - eps ) {
+                    date = dates[ index ];
+                    date.hasEvent = true;
+
+                    // add sources
+                    date.events = date.events || [];
+                    date.events.push( event );
+
+                    // add sources
+                    date.eventSources = date.eventSources || {};
+                    date.eventSources[ eventSource.etag ] = date.eventSources[ eventSource.etag ] || {
+                        summary: eventSource.summary,
+                        color: eventSource.color,
+                        etag: eventSource.etag
+                    };
+                    index += 1;
+                }
             }
         }
 
@@ -554,7 +564,8 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     function createDateObject( date, format ) {
         return {
             date: date,
-            label: dateFilter( date, format )
+            label: dateFilter( date, format ),
+            formatedDayHeader: dateFilter( date, vm.formatDayHeader )
         };
     }
 
@@ -595,6 +606,21 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     }
 }
 
+angular.module( 'ui.rCalendar' ).directive( 'day', function monthDayDirective() {
+    'use strict';
+    return {
+        restrict: 'A',
+        replace: true,
+        templateUrl: 'src/month-day-tpls.html',
+        scope: {
+            day: '=',
+            onSelect: '&',
+            getClasses: '&'
+        }
+    };
+} );
+
+
 angular.module("src/calendar-tpls.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("src/calendar-tpls.html",
     "<div class=\"calendar-container\">\n" +
@@ -609,147 +635,189 @@ angular.module("src/calendar-tpls.html", []).run(["$templateCache", function($te
     "					<thead>\n" +
     "					<tr>\n" +
     "						<th ng-repeat=\"day in view.dates.slice(0,7) track by day.date\">\n" +
-    "							<small>{{::day.date | date: vm.formatDayHeader}}</small>\n" +
+    "							<small>{{::day.formatedDayHeader}}</small>\n" +
     "						</th>\n" +
     "					</tr>\n" +
     "					</thead>\n" +
     "					<tbody>\n" +
     "					<tr>\n" +
-    "						<td ng-click=\"vm.select(view.dates[0].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[0])\">{{view.dates[0].label}}\n" +
+    "						<td day=\"view.dates[0]\"\n" +
+    "							on-select=\"vm.select(view.dates[0].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[0])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[1].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[1])\">{{view.dates[1].label}}\n" +
+    "						<td day=\"view.dates[1]\"\n" +
+    "							on-select=\"vm.select(view.dates[1].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[1])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[2].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[2])\">{{view.dates[2].label}}\n" +
+    "						<td day=\"view.dates[2]\"\n" +
+    "							on-select=\"vm.select(view.dates[2].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[2])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[3].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[3])\">{{view.dates[3].label}}\n" +
+    "						<td day=\"view.dates[3]\"\n" +
+    "							on-select=\"vm.select(view.dates[3].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[3])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[4].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[4])\">{{view.dates[4].label}}\n" +
+    "						<td day=\"view.dates[4]\"\n" +
+    "							on-select=\"vm.select(view.dates[4].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[4])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[5].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[5])\">{{view.dates[5].label}}\n" +
+    "						<td day=\"view.dates[5]\"\n" +
+    "							on-select=\"vm.select(view.dates[5].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[5])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[6].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[6])\">{{view.dates[6].label}}\n" +
-    "						</td>\n" +
-    "					</tr>\n" +
-    "					<tr>\n" +
-    "						<td ng-click=\"vm.select(view.dates[7].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[7])\">{{view.dates[7].label}}\n" +
-    "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[8].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[8])\">{{view.dates[8].label}}\n" +
-    "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[9].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[9])\">{{view.dates[9].label}}\n" +
-    "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[10].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[10])\">{{view.dates[10].label}}\n" +
-    "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[11].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[11])\">{{view.dates[11].label}}\n" +
-    "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[12].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[12])\">{{view.dates[12].label}}\n" +
-    "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[13].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[13])\">{{view.dates[13].label}}\n" +
+    "						<td day=\"view.dates[6]\"\n" +
+    "							on-select=\"vm.select(view.dates[6].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[6])\">\n" +
     "						</td>\n" +
     "					</tr>\n" +
     "					<tr>\n" +
-    "						<td ng-click=\"vm.select(view.dates[14].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[14])\">{{view.dates[14].label}}\n" +
+    "						<td day=\"view.dates[7]\"\n" +
+    "							on-select=\"vm.select(view.dates[7].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[7])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[15].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[15])\">{{view.dates[15].label}}\n" +
+    "						<td day=\"view.dates[8]\"\n" +
+    "							on-select=\"vm.select(view.dates[8].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[8])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[16].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[16])\">{{view.dates[16].label}}\n" +
+    "						<td day=\"view.dates[9]\"\n" +
+    "							on-select=\"vm.select(view.dates[9].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[9])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[17].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[17])\">{{view.dates[17].label}}\n" +
+    "						<td day=\"view.dates[10]\"\n" +
+    "							on-select=\"vm.select(view.dates[10].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[10])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[18].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[18])\">{{view.dates[18].label}}\n" +
+    "						<td day=\"view.dates[11]\"\n" +
+    "							on-select=\"vm.select(view.dates[11].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[11])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[19].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[19])\">{{view.dates[19].label}}\n" +
+    "						<td day=\"view.dates[12]\"\n" +
+    "							on-select=\"vm.select(view.dates[12].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[12])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[20].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[20])\">{{view.dates[20].label}}\n" +
-    "						</td>\n" +
-    "					</tr>\n" +
-    "					<tr>\n" +
-    "						<td ng-click=\"vm.select(view.dates[21].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[21])\">{{view.dates[21].label}}\n" +
-    "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[22].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[22])\">{{view.dates[22].label}}\n" +
-    "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[23].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[23])\">{{view.dates[23].label}}\n" +
-    "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[24].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[24])\">{{view.dates[24].label}}\n" +
-    "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[25].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[25])\">{{view.dates[25].label}}\n" +
-    "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[26].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[26])\">{{view.dates[26].label}}\n" +
-    "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[27].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[27])\">{{view.dates[27].label}}\n" +
+    "						<td day=\"view.dates[13]\"\n" +
+    "							on-select=\"vm.select(view.dates[13].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[13])\">\n" +
     "						</td>\n" +
     "					</tr>\n" +
     "					<tr>\n" +
-    "						<td ng-click=\"vm.select(view.dates[28].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[28])\">{{view.dates[28].label}}\n" +
+    "						<td day=\"view.dates[14]\"\n" +
+    "							on-select=\"vm.select(view.dates[14].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[14])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[29].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[29])\">{{view.dates[29].label}}\n" +
+    "						<td day=\"view.dates[15]\"\n" +
+    "							on-select=\"vm.select(view.dates[15].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[15])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[30].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[30])\">{{view.dates[30].label}}\n" +
+    "						<td day=\"view.dates[16]\"\n" +
+    "							on-select=\"vm.select(view.dates[16].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[16])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[31].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[31])\">{{view.dates[31].label}}\n" +
+    "						<td day=\"view.dates[17]\"\n" +
+    "							on-select=\"vm.select(view.dates[17].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[17])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[32].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[32])\">{{view.dates[32].label}}\n" +
+    "						<td day=\"view.dates[18]\"\n" +
+    "							on-select=\"vm.select(view.dates[18].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[18])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[33].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[33])\">{{view.dates[33].label}}\n" +
+    "						<td day=\"view.dates[19]\"\n" +
+    "							on-select=\"vm.select(view.dates[19].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[19])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[34].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[34])\">{{view.dates[34].label}}\n" +
+    "						<td day=\"view.dates[20]\"\n" +
+    "							on-select=\"vm.select(view.dates[20].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[20])\">\n" +
     "						</td>\n" +
     "					</tr>\n" +
     "					<tr>\n" +
-    "						<td ng-click=\"vm.select(view.dates[35].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[35])\">{{view.dates[35].label}}\n" +
+    "						<td day=\"view.dates[21]\"\n" +
+    "							on-select=\"vm.select(view.dates[21].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[21])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[36].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[36])\">{{view.dates[36].label}}\n" +
+    "						<td day=\"view.dates[22]\"\n" +
+    "							on-select=\"vm.select(view.dates[22].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[22])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[37].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[37])\">{{view.dates[37].label}}\n" +
+    "						<td day=\"view.dates[23]\"\n" +
+    "							on-select=\"vm.select(view.dates[23].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[23])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[38].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[38])\">{{view.dates[38].label}}\n" +
+    "						<td day=\"view.dates[24]\"\n" +
+    "							on-select=\"vm.select(view.dates[24].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[24])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[39].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[39])\">{{view.dates[39].label}}\n" +
+    "						<td day=\"view.dates[25]\"\n" +
+    "							on-select=\"vm.select(view.dates[25].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[25])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[40].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[40])\">{{view.dates[40].label}}\n" +
+    "						<td day=\"view.dates[26]\"\n" +
+    "							on-select=\"vm.select(view.dates[26].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[26])\">\n" +
     "						</td>\n" +
-    "						<td ng-click=\"vm.select(view.dates[41].date)\"\n" +
-    "							ng-class=\"vm.getHighlightClass(view.dates[41])\">{{view.dates[41].label}}\n" +
+    "						<td day=\"view.dates[27]\"\n" +
+    "							on-select=\"vm.select(view.dates[27].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[27])\">\n" +
+    "						</td>\n" +
+    "					</tr>\n" +
+    "					<tr>\n" +
+    "						<td day=\"view.dates[28]\"\n" +
+    "							on-select=\"vm.select(view.dates[28].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[28])\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[29]\"\n" +
+    "							on-select=\"vm.select(view.dates[29].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[29])\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[30]\"\n" +
+    "							on-select=\"vm.select(view.dates[30].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[30])\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[31]\"\n" +
+    "							on-select=\"vm.select(view.dates[31].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[31])\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[32]\"\n" +
+    "							on-select=\"vm.select(view.dates[32].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[32])\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[33]\"\n" +
+    "							on-select=\"vm.select(view.dates[33].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[33])\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[34]\"\n" +
+    "							on-select=\"vm.select(view.dates[24].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[24])\">\n" +
+    "						</td>\n" +
+    "					</tr>\n" +
+    "					<tr>\n" +
+    "						<td day=\"view.dates[35]\"\n" +
+    "							on-select=\"vm.select(view.dates[35].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[35])\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[36]\"\n" +
+    "							on-select=\"vm.select(view.dates[36].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[36])\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[37]\"\n" +
+    "							on-select=\"vm.select(view.dates[37].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[37])\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[38]\"\n" +
+    "							on-select=\"vm.select(view.dates[38].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[38])\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[39]\"\n" +
+    "							on-select=\"vm.select(view.dates[39].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[39])\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[40]\"\n" +
+    "							on-select=\"vm.select(view.dates[40].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[40])\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[41]\"\n" +
+    "							on-select=\"vm.select(view.dates[41].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[41])\">\n" +
     "						</td>\n" +
     "					</tr>\n" +
     "					</tbody>\n" +
@@ -758,64 +826,106 @@ angular.module("src/calendar-tpls.html", []).run(["$templateCache", function($te
     "					<thead>\n" +
     "					<tr class=\"text-center\">\n" +
     "						<th ng-repeat=\"day in view.dates.slice(0,7) track by day.date\">\n" +
-    "							<small>{{::day.date | date: vm.formatDayHeader}}</small>\n" +
+    "							<small>{{::day.formatedDayHeader}}</small>\n" +
     "						</th>\n" +
     "					</tr>\n" +
     "					</thead>\n" +
     "					<tbody>\n" +
     "					<tr>\n" +
-    "						<td>{{view.dates[0].label}}</td>\n" +
-    "						<td>{{view.dates[1].label}}</td>\n" +
-    "						<td>{{view.dates[2].label}}</td>\n" +
-    "						<td>{{view.dates[3].label}}</td>\n" +
-    "						<td>{{view.dates[4].label}}</td>\n" +
-    "						<td>{{view.dates[5].label}}</td>\n" +
-    "						<td>{{view.dates[6].label}}</td>\n" +
+    "						<td day=\"view.dates[0]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[1]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[2]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[3]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[4]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[5]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[6]\">\n" +
+    "						</td>\n" +
     "					</tr>\n" +
     "					<tr>\n" +
-    "						<td>{{view.dates[7].label}}</td>\n" +
-    "						<td>{{view.dates[8].label}}</td>\n" +
-    "						<td>{{view.dates[9].label}}</td>\n" +
-    "						<td>{{view.dates[10].label}}</td>\n" +
-    "						<td>{{view.dates[11].label}}</td>\n" +
-    "						<td>{{view.dates[12].label}}</td>\n" +
-    "						<td>{{view.dates[13].label}}</td>\n" +
+    "						<td day=\"view.dates[7]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[8]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[9]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[10]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[11]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[12]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[13]\">\n" +
+    "						</td>\n" +
     "					</tr>\n" +
     "					<tr>\n" +
-    "						<td>{{view.dates[14].label}}</td>\n" +
-    "						<td>{{view.dates[15].label}}</td>\n" +
-    "						<td>{{view.dates[16].label}}</td>\n" +
-    "						<td>{{view.dates[17].label}}</td>\n" +
-    "						<td>{{view.dates[18].label}}</td>\n" +
-    "						<td>{{view.dates[19].label}}</td>\n" +
-    "						<td>{{view.dates[20].label}}</td>\n" +
+    "						<td day=\"view.dates[14]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[15]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[16]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[17]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[18]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[19]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[20]\">\n" +
+    "						</td>\n" +
     "					</tr>\n" +
     "					<tr>\n" +
-    "						<td>{{view.dates[21].label}}</td>\n" +
-    "						<td>{{view.dates[22].label}}</td>\n" +
-    "						<td>{{view.dates[23].label}}</td>\n" +
-    "						<td>{{view.dates[24].label}}</td>\n" +
-    "						<td>{{view.dates[25].label}}</td>\n" +
-    "						<td>{{view.dates[26].label}}</td>\n" +
-    "						<td>{{view.dates[27].label}}</td>\n" +
+    "						<td day=\"view.dates[21]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[22]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[23]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[24]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[25]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[26]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[27]\">\n" +
+    "						</td>\n" +
     "					</tr>\n" +
     "					<tr>\n" +
-    "						<td>{{view.dates[28].label}}</td>\n" +
-    "						<td>{{view.dates[29].label}}</td>\n" +
-    "						<td>{{view.dates[30].label}}</td>\n" +
-    "						<td>{{view.dates[31].label}}</td>\n" +
-    "						<td>{{view.dates[32].label}}</td>\n" +
-    "						<td>{{view.dates[33].label}}</td>\n" +
-    "						<td>{{view.dates[34].label}}</td>\n" +
+    "						<td day=\"view.dates[28]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[29]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[30]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[31]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[32]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[33]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[34]\">\n" +
+    "						</td>\n" +
     "					</tr>\n" +
     "					<tr>\n" +
-    "						<td>{{view.dates[35].label}}</td>\n" +
-    "						<td>{{view.dates[36].label}}</td>\n" +
-    "						<td>{{view.dates[37].label}}</td>\n" +
-    "						<td>{{view.dates[38].label}}</td>\n" +
-    "						<td>{{view.dates[39].label}}</td>\n" +
-    "						<td>{{view.dates[40].label}}</td>\n" +
-    "						<td>{{view.dates[41].label}}</td>\n" +
+    "						<td day=\"view.dates[35]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[36]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[37]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[38]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[39]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[40]\">\n" +
+    "						</td>\n" +
+    "						<td day=\"view.dates[41]\">\n" +
+    "						</td>\n" +
     "					</tr>\n" +
     "					</tbody>\n" +
     "				</table>\n" +
@@ -825,18 +935,21 @@ angular.module("src/calendar-tpls.html", []).run(["$templateCache", function($te
     "					 has-bouncing=\"false\"\n" +
     "					 ng-show=\"vm.showEventDetail\"\n" +
     "					 overflow-scroll=\"false\">\n" +
+    "			<!--<h3>{{vm.selectedDate.events.length}}</h3>-->\n" +
+    "\n" +
     "			<table class=\"table table-bordered table-striped table-fixed event-detail-table\">\n" +
-    "				<tr ng-repeat=\"event in vm.selectedDate.events\"\n" +
+    "				<tr ng-repeat=\"event in vm.selectedDate.events track by event.etag\"\n" +
     "					ng-click=\"vm.eventSelected({event:event})\">\n" +
     "					<td ng-if=\"!event.allDay\"\n" +
     "						class=\"monthview-eventdetail-timecolumn\">\n" +
-    "						{{::event.startTime|date: 'HH:mm'}}\n" +
+    "						{{::event.formatedStartTime}}\n" +
     "						-\n" +
-    "						{{::event.endTime|date: 'HH:mm'}}\n" +
+    "						{{::event.formatedEndTime}}\n" +
     "					</td>\n" +
-    "					<td ng-if=\"event.allDay\" class=\"monthview-eventdetail-timecolumn\">All day</td>\n" +
-    "					<td class=\"event-detail\">{{::event.title}}</td>\n" +
+    "					<td ng-if=\"event.allDay\" class=\"monthview-eventdetail-timecolumn\">O dia todo</td>\n" +
+    "					<td class=\"event-detail\">{{::event.summary}}</td>\n" +
     "				</tr>\n" +
+    "\n" +
     "				<tr ng-if=\"!vm.selectedDate.events\">\n" +
     "					<td class=\"no-event-label\" ng-bind=\"::noEventsLabel\"></td>\n" +
     "				</tr>\n" +
@@ -844,4 +957,18 @@ angular.module("src/calendar-tpls.html", []).run(["$templateCache", function($te
     "		</ion-content>\n" +
     "	</div>\n" +
     "</div>");
+}]);
+
+angular.module("src/month-day-tpls.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("src/month-day-tpls.html",
+    "<td ng-click=\"onSelect()\"\n" +
+    "	ng-class=\"getClasses()\">\n" +
+    "	<span class=\"datex\">{{::day.label}}</span>\n" +
+    "	<div class=\"pins\">\n" +
+    "		<span class=\"pin\"\n" +
+    "			  ng-style=\"{'background-color': source.color }\"\n" +
+    "			  ng-repeat=\"source in day.eventSources track by source.etag\">\n" +
+    "		</span>\n" +
+    "	</div>\n" +
+    "</td>");
 }]);
