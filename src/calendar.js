@@ -44,8 +44,7 @@ angular.module( 'ui.rCalendar' ).constant( 'calendarConfig', {
     allDayLabel: 'O dia todo',
     noEventsLabel: 'Nenhum evento encontrado',
     eventSources: null,
-    queryMode: 'local',
-    step: 60
+    queryMode: 'local'
 } );
 angular.module( 'ui.rCalendar' ).controller( 'ui.rCalendar.CalendarController', CalendarController );
 
@@ -87,13 +86,6 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     vm.mode = {
         step: { months: 1 }
     };
-
-    vm.hourParts = 1;
-    if ( vm.step === 60 || vm.step === 30 || vm.step === 15 ) {
-        vm.hourParts = Math.floor( 60 / vm.step );
-    } else {
-        throw new Error( 'Invalid step parameter: ' + vm.step );
-    }
 
     $scope.$parent.$watch( $attrs.eventSources, function( value ) {
         vm.onEventSourceChanged( value );
@@ -382,9 +374,9 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     function getAdjacentCalendarDate( currentCalendarDate, direction ) {
         var step = vm.mode.step;
         var calculateCalendarDate = new Date( currentCalendarDate );
-        var year = calculateCalendarDate.getFullYear() + direction * ( step.years || 0 );
+        var year = calculateCalendarDate.getFullYear();
         var month = calculateCalendarDate.getMonth() + direction * ( step.months || 0 );
-        var date = calculateCalendarDate.getDate() + direction * ( step.days || 0 );
+        var date = 1; //calculateCalendarDate.getDate(); mantem o dia selecionado
         var firstDayInNextMonth;
 
         calculateCalendarDate.setFullYear( year, month, date );
@@ -393,7 +385,6 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         if ( firstDayInNextMonth.getTime() <= calculateCalendarDate.getTime() ) {
             calculateCalendarDate = new Date( firstDayInNextMonth - 24 * 60 * 60 * 1000 );
         }
-
         return calculateCalendarDate;
     }
 
@@ -511,10 +502,10 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
                     // add sources
                     date.eventSources = date.eventSources || {};
                     date.eventSources[ eventSource.etag ] = date.eventSources[ eventSource.etag ] || {
-                        summary: eventSource.summary,
-                        color: eventSource.color,
-                        etag: eventSource.etag
-                    };
+                            summary: eventSource.summary,
+                            color: eventSource.color,
+                            etag: eventSource.etag
+                        };
                     index += 1;
                 }
             }
