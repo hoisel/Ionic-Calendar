@@ -43,7 +43,7 @@ angular.module( 'ui.rCalendar' ).constant( 'calendarConfig', {
     startingDayWeek: 0,
     allDayLabel: 'O dia todo',
     noEventsLabel: 'Nenhum evento encontrado',
-    eventSource: null,
+    eventSources: null,
     queryMode: 'local',
     step: 60
 } );
@@ -75,7 +75,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         'allDayLabel',
         'noEventsLabel',
         'showEventDetail',
-        'eventSource',
+        'eventSources',
         'queryMode',
         'step',
         'startingDayMonth',
@@ -95,7 +95,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         throw new Error( 'Invalid step parameter: ' + vm.step );
     }
 
-    $scope.$parent.$watch( $attrs.eventSource, function( value ) {
+    $scope.$parent.$watch( $attrs.eventSources, function( value ) {
         vm.onEventSourceChanged( value );
     } );
 
@@ -157,7 +157,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     };
 
     vm.onEventSourceChanged = function( value ) {
-        vm.eventSource = value;
+        vm.eventSources = value;
         if ( onDataLoaded ) {
             onDataLoaded();
         }
@@ -182,7 +182,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
 
     vm.rangeChanged = function() {
         if ( vm.queryMode === 'local' ) {
-            if ( vm.eventSource && onDataLoaded ) {
+            if ( vm.eventSources && onDataLoaded ) {
                 onDataLoaded();
             }
         } else if ( vm.queryMode === 'remote' ) {
@@ -416,8 +416,10 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     }
 
     function onDataLoaded() {
-        var eventSource = vm.eventSource;
-        var len = eventSource ? eventSource.length : 0;
+        var eventSources = vm.eventSources;
+        var eventSource;
+        var sourceLength = eventSources ? eventSources.length : 0;
+        var eventsLength;
         var startTime = vm.range.startTime;
         var endTime = vm.range.endTime;
         var timeZoneOffset = -new Date().getTimezoneOffset();
@@ -429,6 +431,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         var eps = 0.001;
         var r;
         var i;
+        var s;
         var event;
         var eventStartTime;
         var eventEndTime;
@@ -446,52 +449,58 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
                 dates[ r ].events = [];
             }
         }
+        for ( s = 0; s < sourceLength; s += 1 ) {
+            eventSource = eventSources[ s ];
+            eventsLength = ( eventSource && eventSource.items ) ? eventSource.items.length : 0;
 
-        for ( i = 0; i < len; i += 1 ) {
-            event = eventSource[ i ];
-            eventStartTime = new Date( event.startTime );
-            eventEndTime = new Date( event.endTime );
-            if ( event.allDay ) {
-                if ( eventEndTime <= utcStartTime || eventStartTime >= utcEndTime ) {
-                    continue;
+            for ( i = 0; i < eventsLength; i += 1 ) {
+
+                event = eventSource.items[ i ];
+                eventStartTime = new Date( event.startTime );
+                eventEndTime = new Date( event.endTime );
+
+                if ( event.allDay ) {
+                    if ( eventEndTime <= utcStartTime || eventStartTime >= utcEndTime ) {
+                        continue;
+                    } else {
+                        st = utcStartTime;
+                        et = utcEndTime;
+                    }
                 } else {
-                    st = utcStartTime;
-                    et = utcEndTime;
+                    if ( eventEndTime <= startTime || eventStartTime >= endTime ) {
+                        continue;
+                    } else {
+                        st = startTime;
+                        et = endTime;
+                    }
                 }
-            } else {
-                if ( eventEndTime <= startTime || eventStartTime >= endTime ) {
-                    continue;
+
+                if ( eventStartTime <= st ) {
+                    timeDifferenceStart = 0;
                 } else {
-                    st = startTime;
-                    et = endTime;
+                    timeDifferenceStart = ( eventStartTime - st ) / oneDay;
                 }
-            }
 
-            if ( eventStartTime <= st ) {
-                timeDifferenceStart = 0;
-            } else {
-                timeDifferenceStart = ( eventStartTime - st ) / oneDay;
-            }
-
-            if ( eventEndTime >= et ) {
-                timeDifferenceEnd = ( et - st ) / oneDay;
-            } else {
-                timeDifferenceEnd = ( eventEndTime - st ) / oneDay;
-            }
-
-            index = Math.floor( timeDifferenceStart );
-
-            while ( index < timeDifferenceEnd - eps ) {
-                dates[ index ].hasEvent = true;
-                eventSet = dates[ index ].events;
-                if ( eventSet ) {
-                    eventSet.push( event );
+                if ( eventEndTime >= et ) {
+                    timeDifferenceEnd = ( et - st ) / oneDay;
                 } else {
-                    eventSet = [];
-                    eventSet.push( event );
-                    dates[ index ].events = eventSet;
+                    timeDifferenceEnd = ( eventEndTime - st ) / oneDay;
                 }
-                index += 1;
+
+                index = Math.floor( timeDifferenceStart );
+
+                while ( index < timeDifferenceEnd - eps ) {
+                    dates[ index ].hasEvent = true;
+                    eventSet = dates[ index ].events;
+                    if ( eventSet ) {
+                        eventSet.push( event );
+                    } else {
+                        eventSet = [];
+                        eventSet.push( event );
+                        dates[ index ].events = eventSet;
+                    }
+                    index += 1;
+                }
             }
         }
 

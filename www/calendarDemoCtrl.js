@@ -53,11 +53,20 @@ function CalendarDemoController( $log ) {
     'use strict';
 
     var vm = this;
+    var eventSources;
 
     vm.calendar = {};
 
     vm.loadEvents = function() {
-        vm.calendar.eventSource = createRandomEvents();
+        eventSources = [
+            { summary: 'SEFAZ' }, { summary: 'SEGER' }, { summary: 'SEJUS' }, { summary: 'PRODEST' }
+        ];
+
+        eventSources.forEach( function( source ) {
+            source.items = createRandomEvents( source.summary, Math.floor( Math.random() * 500 ), source.color );
+        } );
+
+        vm.calendar.eventSources = eventSources;
     };
 
     vm.onEventSelected = function( event ) {

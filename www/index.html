@@ -45,7 +45,7 @@
 				<ion-content scroll="false"
 							 class="main-content">
 					<calendar ng-model="vm.calendar.currentDate"
-							  event-source="vm.calendar.eventSource"
+							  event-sources="vm.calendar.eventSources"
 							  range-changed="vm.reloadSource(startTime, endTime)"
 							  event-selected="vm.onEventSelected(event)"
 							  title-changed="vm.onViewTitleChanged(title)"
