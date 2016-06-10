@@ -37,7 +37,7 @@ angular.module( 'ui.rCalendar' ).constant( 'calendarConfig', {
     formatDay: 'dd',
     formatDayHeader: 'EEE',
     formatMonthTitle: 'MMMM yyyy',
-    formatHourColumn: 'ha',
+    formatHourColumn: 'HH:mm',
     showEventDetail: true,
     startingDayMonth: 0,
     startingDayWeek: 0,
@@ -427,6 +427,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         var utcEndTime = new Date( endTime.getTime() + timeZoneOffset * 60 * 1000 );
         var currentViewIndex = vm.currentViewIndex;
         var dates = vm.views[ currentViewIndex ].dates;
+        var date;
         var oneDay = 86400000;
         var eps = 0.001;
         var r;
@@ -444,17 +445,19 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         var findSelected;
 
         for ( r = 0; r < 42; r += 1 ) {
-            if ( dates[ r ].hasEvent ) {
-                dates[ r ].hasEvent = false;
-                dates[ r ].events = [];
+            date = dates[ r ];
+            if ( date.hasEvent ) {
+                date.hasEvent = false;
+                date.events = [];
+                date.eventSources = {};
             }
         }
+
         for ( s = 0; s < sourceLength; s += 1 ) {
             eventSource = eventSources[ s ];
             eventsLength = ( eventSource && eventSource.items ) ? eventSource.items.length : 0;
 
             for ( i = 0; i < eventsLength; i += 1 ) {
-
                 event = eventSource.items[ i ];
                 eventStartTime = new Date( event.startTime );
                 eventEndTime = new Date( event.endTime );
@@ -475,6 +478,9 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
                     }
                 }
 
+                event.formatedStartTime = dateFilter( eventStartTime, vm.formatHourColumn );
+                event.formatedEndTime = dateFilter( eventEndTime, vm.formatHourColumn );
+
                 if ( eventStartTime <= st ) {
                     timeDifferenceStart = 0;
                 } else {
@@ -490,15 +496,25 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
                 index = Math.floor( timeDifferenceStart );
 
                 while ( index < timeDifferenceEnd - eps ) {
-                    dates[ index ].hasEvent = true;
-                    eventSet = dates[ index ].events;
+                    date = dates[ index ];
+                    date.hasEvent = true;
+
+                    eventSet = date.events;
                     if ( eventSet ) {
                         eventSet.push( event );
                     } else {
                         eventSet = [];
                         eventSet.push( event );
-                        dates[ index ].events = eventSet;
+                        date.events = eventSet;
                     }
+
+                    // add sources
+                    date.eventSources = date.eventSources || {};
+                    date.eventSources[ eventSource.etag ] = date.eventSources[ eventSource.etag ] || {
+                        summary: eventSource.summary,
+                        color: eventSource.color,
+                        etag: eventSource.etag
+                    };
                     index += 1;
                 }
             }
@@ -562,7 +578,8 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
     function createDateObject( date, format ) {
         return {
             date: date,
-            label: dateFilter( date, format )
+            label: dateFilter( date, format ),
+            formatedDayHeader: dateFilter( date, vm.formatDayHeader )
         };
     }
 
@@ -602,3 +619,18 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         }
     }
 }
+
+angular.module( 'ui.rCalendar' ).directive( 'day', function monthDayDirective() {
+    'use strict';
+    return {
+        restrict: 'A',
+        replace: true,
+        templateUrl: 'src/month-day-tpls.html',
+        scope: {
+            day: '=',
+            onSelect: '&',
+            getClasses: '&'
+        }
+    };
+} );
+
