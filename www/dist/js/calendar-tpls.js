@@ -966,7 +966,7 @@ angular.module("src/month-day-tpls.html", []).run(["$templateCache", function($t
   $templateCache.put("src/month-day-tpls.html",
     "<td ng-click=\"onSelect()\"\n" +
     "	ng-class=\"getClasses()\">\n" +
-    "	<span class=\"datex\">{{::day.label}}</span>\n" +
+    "	<span class=\"datex\">{{day.label}}</span>\n" +
     "	<div class=\"pins\">\n" +
     "		<span class=\"pin\"\n" +
     "			  ng-style=\"{'background-color': source.color }\"\n" +
