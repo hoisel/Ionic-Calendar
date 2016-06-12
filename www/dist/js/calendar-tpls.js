@@ -789,8 +789,8 @@ angular.module("src/calendar-tpls.html", []).run(["$templateCache", function($te
     "							get-classes=\"vm.getHighlightClass(view.dates[33])\">\n" +
     "						</td>\n" +
     "						<td day=\"view.dates[34]\"\n" +
-    "							on-select=\"vm.select(view.dates[24].date)\"\n" +
-    "							get-classes=\"vm.getHighlightClass(view.dates[24])\">\n" +
+    "							on-select=\"vm.select(view.dates[34].date)\"\n" +
+    "							get-classes=\"vm.getHighlightClass(view.dates[34])\">\n" +
     "						</td>\n" +
     "					</tr>\n" +
     "					<tr>\n" +
