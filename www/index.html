@@ -52,15 +52,17 @@
 					<button class="button" ng-disabled="vm.isToday()" ng-click="vm.today()">Hoje</button>
 					<button class="button" ng-click="vm.loadEvents()">Carregar Eventos</button>
 				</ion-nav-buttons>
-
-				<ion-content scroll="false"
+				<ion-content scroll="true"
 							 class="main-content">
+					<ion-refresher pulling-text="Atualizar..."
+								   spinner="none"
+								   on-refresh="vm.loadEvents()"></ion-refresher>
 					<calendar ng-model="vm.calendar.currentDate"
 							  event-sources="vm.calendar.eventSources"
 							  range-changed="vm.reloadSource(startTime, endTime)"
 							  event-selected="vm.onEventSelected(event)"
 							  title-changed="vm.onViewTitleChanged(title)"
-							  time-selected="vm.onTimeSelected(selectedTime)" step="30"></calendar>
+							  time-selected="vm.onTimeSelected(selectedTime)"></calendar>
 				</ion-content>
 			</ion-view>
 		</script>

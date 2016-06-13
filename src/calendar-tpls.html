@@ -313,7 +313,7 @@
 			<!--<h3>{{vm.selectedDate.events.length}}</h3>-->
 
 			<table class="table table-fixed event-detail-table">
-				<tr ng-repeat="event in vm.selectedDate.events track by event.etag"
+				<tr ng-repeat="event in vm.selectedDate.events track by event.id"
 					ng-click="vm.eventSelected({event:event})">
 					<td ng-if="event.allDay">
 						<div class="event-detail"
@@ -323,7 +323,7 @@
 					<td ng-if="!event.allDay">
 						<div class="event-detail"
 							 ng-style="{'background-color': event.color }">
-							<div>{{::event.summary}}</div>
+							<div>{{::event.source}} - {{::event.summary}}</div>
 							<div>
 								{{::event.formatedStartTime}}
 								-
