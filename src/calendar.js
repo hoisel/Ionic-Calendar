@@ -452,8 +452,8 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
 
             for ( i = 0; i < eventsLength; i += 1 ) {
                 event = eventSource.items[ i ];
-                eventStartTime = new Date( event.startTime );
-                eventEndTime = new Date( event.endTime );
+                eventStartTime = new Date( event.start.dateTime );
+                eventEndTime = new Date( event.end.dateTime );
 
                 if ( event.allDay ) {
                     if ( eventEndTime <= utcStartTime || eventStartTime >= utcEndTime ) {
@@ -471,16 +471,16 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
                     }
                 }
 
-                /*if ( eventStartTime.getDate() == eventEndTime.getDate() ) {
+                if ( eventStartTime.getDate() == eventEndTime.getDate() ) {
                     event.formatedStartTime = dateFilter( eventStartTime, 'HH:mm' );
                     event.formatedEndTime = dateFilter( eventEndTime, 'HH:mm' );
                 } else {
                     event.formatedStartTime = dateFilter( eventStartTime, vm.formatHourColumn );
                     event.formatedEndTime = dateFilter( eventEndTime, vm.formatHourColumn );
-                }*/
+                }
 
-                event.formatedStartTime = dateFilter( eventStartTime, vm.formatHourColumn );
-                event.formatedEndTime = dateFilter( eventEndTime, vm.formatHourColumn );
+                /*     event.formatedStartTime = dateFilter( eventStartTime, vm.formatHourColumn );
+                 event.formatedEndTime = dateFilter( eventEndTime, vm.formatHourColumn );*/
 
                 if ( eventStartTime <= st ) {
                     timeDifferenceStart = 0;
@@ -505,6 +505,8 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
                     date.events.push( event );
 
                     // add sources
+                    event.source = event.source || eventSource.summary;
+
                     date.eventSources = date.eventSources || {};
                     date.eventSources[ eventSource.etag ] = date.eventSources[ eventSource.etag ] || {
                         summary: eventSource.summary,
@@ -611,7 +613,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         } else if ( event2.allDay ) {
             return -1;
         } else {
-            return ( event1.startTime.getTime() - event2.startTime.getTime() );
+            return ( new Date( event1.start.dateTime ).getTime() - new Date( event2.start.dateTime ).getTime() );
         }
     }
 }

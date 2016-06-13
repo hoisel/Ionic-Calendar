@@ -2,10 +2,36 @@ angular.module( 'calendarDemoApp', [ 'ionic', 'ngAnimate', 'ui.rCalendar' ] );
 angular.module( 'calendarDemoApp' ).controller( 'CalendarDemoController', CalendarDemoController );
 angular.module( 'calendarDemoApp' ).config( appConfig );
 angular.module( 'calendarDemoApp' ).run( appRun );
+angular.module( 'calendarDemoApp' ).service( 'eventsService', eventsService );
+angular.module( 'calendarDemoApp' ).service( 'agendasService', agendasService );
 
+agendasService.$inject = [ '$http' ];
+eventsService.$inject = [ '$http' ];
 appRun.$inject = [ '$ionicPlatform', '$animate' ];
 appConfig.$inject = [ '$stateProvider', '$urlRouterProvider' ];
-CalendarDemoController.$inject = [ '$log' ];
+CalendarDemoController.$inject = [
+    '$scope',
+    '$log',
+    'eventsService',
+    'agendasService',
+    '$ionicLoading'
+];
+
+function agendasService( $http ) {
+    var urlBase = 'http://10.243.9.4/agendas';
+
+    this.getAll = function() {
+        return $http.get( urlBase );
+    };
+}
+
+function eventsService( $http ) {
+    var urlBase = 'http://10.243.9.4/events';
+
+    this.getEventsFor = function( agendas ) {
+        return $http.get( urlBase, { params: { agendas: agendas } } );
+    };
+}
 
 function appRun( $ionicPlatform, $animate ) {
     'use strict';
@@ -49,13 +75,11 @@ function appConfig( $stateProvider, $urlRouterProvider ) {
     $urlRouterProvider.otherwise( '/tab/home' );
 }
 
-function CalendarDemoController( $log ) {
+function CalendarDemoController( $scope, $log, eventsService, agendasService, $ionicLoading ) {
     'use strict';
 
-    var numberOfEvents;
     var i;
     var vm = this;
-    var eventSources;
     var colors = new Array( 100 );
 
     for ( i = 0; i < colors.length; i += 1 ) {
@@ -63,33 +87,25 @@ function CalendarDemoController( $log ) {
     }
 
     vm.calendar = {};
+    vm.loadAgendas = function() {
+        $ionicLoading.show( { delay: 300 } );
+        agendasService.getAll()
+                      .then( function( response ) {
+                          $ionicLoading.hide();
+                          vm.eventSourcesList = response.data;
+                      } );
+    };
 
     vm.loadEvents = function() {
-        numberOfEvents = 0;
-
-        eventSources = [
-            { summary: 'SEFAZ' },
-            { summary: 'SEGER' },
-            { summary: 'SEJUS' },
-            { summary: 'PRODEST' },
-            { summary: 'SECONT' },
-            { summary: 'SECULT' },
-            { summary: 'SEDU' },
-            { summary: 'SESA' },
-            { summary: 'SESP' }
-        ];
-
-        eventSources.forEach( function( source ) {
-            source.color = colors[ Math.floor( Math.random() * ( ( colors.length - 1 ) - 0 + 1 ) ) ];
-            source.items = createRandomEvents( source.summary, Math.floor( Math.random() * 50 ), source.color );
-            source.etag = guid();
-
-            numberOfEvents += source.items.length;
-        } );
-
-        $log.info( 'numberOfEvents:', numberOfEvents );
-
-        vm.calendar.eventSources = eventSources;
+        $ionicLoading.show( { delay: 300 } );
+        eventsService.getEventsFor( [ 'SESA', 'SEFAZ', 'SEDU', 'PRODEST' ] )
+                     .then( function( response ) {
+                         vm.calendar.eventSources = response.data;
+                     } )
+                     .finally( function() {
+                         $ionicLoading.hide();
+                         $scope.$broadcast( 'scroll.refreshComplete' );
+                     } );
 
     };
 
@@ -118,76 +134,77 @@ function CalendarDemoController( $log ) {
         $log.info( 'Selected time: ' + selectedTime );
     };
 
+    vm.loadEvents();
     ///////////////////////////////////////////////////////////////////////
 
-    function guid() {
-        function s4() {
-            return Math.floor( ( 1 + Math.random() ) * 0x10000 )
-                       .toString( 16 )
-                       .substring( 1 );
-        }
+    /*function guid() {
+     function s4() {
+     return Math.floor( ( 1 + Math.random() ) * 0x10000 )
+     .toString( 16 )
+     .substring( 1 );
+     }
 
-        return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-    }
+     return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+     }
+     */
+    /*function createRandomEvents( source, numOfEvents, color ) {
+     var events = [];
+     var date;
+     var eventType;
+     var startDay;
+     var endDay;
+     var startTime;
+     var endTime;
+     var i;
+     var startMinute;
+     var endMinute;
 
-    function createRandomEvents( source, numOfEvents, color ) {
-        var events = [];
-        var date;
-        var eventType;
-        var startDay;
-        var endDay;
-        var startTime;
-        var endTime;
-        var i;
-        var startMinute;
-        var endMinute;
+     for ( i = 0; i < numOfEvents; i += 1 ) {
+     date = new Date();
+     eventType = Math.floor( Math.random() * 2 );
+     startDay = Math.floor( Math.random() * 90 ) - 45;
+     endDay = Math.floor( Math.random() * 2 ) + startDay;
 
-        for ( i = 0; i < numOfEvents; i += 1 ) {
-            date = new Date();
-            eventType = Math.floor( Math.random() * 2 );
-            startDay = Math.floor( Math.random() * 90 ) - 45;
-            endDay = Math.floor( Math.random() * 2 ) + startDay;
+     if ( eventType === 0 ) {
+     startTime = new Date( Date.UTC( date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + startDay ) );
+     if ( endDay === startDay ) {
+     endDay += 1;
+     }
+     endTime = new Date( Date.UTC( date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + endDay ) );
+     events.push( {
+     summary: source + ' - Event ' + i,
+     startTime: startTime,
+     endTime: endTime,
+     allDay: true,
+     color: color,
+     etag: guid()
+     } );
+     } else {
+     startMinute = Math.floor( Math.random() * 24 * 60 );
+     endMinute = Math.floor( Math.random() * 180 ) + startMinute;
+     startTime = new Date( date.getFullYear(), date.getMonth(), date.getDate() + startDay, 0, date.getMinutes() + startMinute );
+     endTime = new Date( date.getFullYear(), date.getMonth(), date.getDate() + endDay, 0, date.getMinutes() + endMinute );
+     events.push( {
+     id: guid(),
+     etag: guid(),
+     summary: source + ' - Event ' + i,
+     startTime: startTime,
+     endTime: endTime,
+     allDay: false,
+     color: color
+     } );
+     }
+     }
 
-            if ( eventType === 0 ) {
-                startTime = new Date( Date.UTC( date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + startDay ) );
-                if ( endDay === startDay ) {
-                    endDay += 1;
-                }
-                endTime = new Date( Date.UTC( date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + endDay ) );
-                events.push( {
-                    summary: source + ' - Event ' + i,
-                    startTime: startTime,
-                    endTime: endTime,
-                    allDay: true,
-                    color: color,
-                    etag: guid()
-                } );
-            } else {
-                startMinute = Math.floor( Math.random() * 24 * 60 );
-                endMinute = Math.floor( Math.random() * 180 ) + startMinute;
-                startTime = new Date( date.getFullYear(), date.getMonth(), date.getDate() + startDay, 0, date.getMinutes() + startMinute );
-                endTime = new Date( date.getFullYear(), date.getMonth(), date.getDate() + endDay, 0, date.getMinutes() + endMinute );
-                events.push( {
-                    id: guid(),
-                    etag: guid(),
-                    summary: source + ' - Event ' + i,
-                    startTime: startTime,
-                    endTime: endTime,
-                    allDay: false,
-                    color: color
-                } );
-            }
-        }
-
-        events.push( {
-            id: guid(),
-            etag: guid(),
-            summary: source + ' - Event dentro do dia',
-            startTime: new Date(),
-            endTime: new Date(),
-            allDay: false,
-            color: color
-        } );
-        return events;
-    }
+     events.push( {
+     id: guid(),
+     etag: guid(),
+     summary: source + ' - Event dentro do dia',
+     startTime: new Date(),
+     endTime: new Date(),
+     allDay: false,
+     color: color
+     } );
+     return events;
+     }*/
 }
