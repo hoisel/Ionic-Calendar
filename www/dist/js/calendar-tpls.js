@@ -41,7 +41,7 @@ angular.module( 'ui.rCalendar' ).constant( 'calendarConfig', {
     formatDay: 'dd',
     formatDayHeader: 'EEE',
     formatMonthTitle: 'MMMM yyyy',
-    formatHourColumn: 'HH:mm',
+    formatHourColumn: 'dd MMMM, HH:mm',
     showEventDetail: true,
     startingDayMonth: 0,
     startingDayWeek: 0,
@@ -327,14 +327,14 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
 
     vm.getHighlightClass = function( date ) {
         var className = '';
-
-        if ( date.hasEvent ) {
-            if ( date.secondary ) {
-                className = 'monthview-secondary-with-event';
-            } else {
-                className = 'monthview-primary-with-event';
-            }
-        }
+        /*
+         if ( date.hasEvent ) {
+         if ( date.secondary ) {
+         className = 'monthview-secondary-with-event';
+         } else {
+         className = 'monthview-primary-with-event';
+         }
+         }*/
 
         if ( date.selected ) {
             if ( className ) {
@@ -354,7 +354,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
             if ( className ) {
                 className += ' ';
             }
-            className += 'text-muted';
+            className += 'monthview-secondary';
         }
         return className;
     };
@@ -471,6 +471,14 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
                         et = endTime;
                     }
                 }
+
+                /*if ( eventStartTime.getDate() == eventEndTime.getDate() ) {
+                    event.formatedStartTime = dateFilter( eventStartTime, 'HH:mm' );
+                    event.formatedEndTime = dateFilter( eventEndTime, 'HH:mm' );
+                } else {
+                    event.formatedStartTime = dateFilter( eventStartTime, vm.formatHourColumn );
+                    event.formatedEndTime = dateFilter( eventEndTime, vm.formatHourColumn );
+                }*/
 
                 event.formatedStartTime = dateFilter( eventStartTime, vm.formatHourColumn );
                 event.formatedEndTime = dateFilter( eventEndTime, vm.formatHourColumn );
@@ -940,21 +948,31 @@ angular.module("src/calendar-tpls.html", []).run(["$templateCache", function($te
     "					 overflow-scroll=\"false\">\n" +
     "			<!--<h3>{{vm.selectedDate.events.length}}</h3>-->\n" +
     "\n" +
-    "			<table class=\"table table-bordered table-striped table-fixed event-detail-table\">\n" +
+    "			<table class=\"table table-fixed event-detail-table\">\n" +
     "				<tr ng-repeat=\"event in vm.selectedDate.events track by event.etag\"\n" +
     "					ng-click=\"vm.eventSelected({event:event})\">\n" +
-    "					<td ng-if=\"!event.allDay\"\n" +
-    "						class=\"monthview-eventdetail-timecolumn\">\n" +
-    "						{{::event.formatedStartTime}}\n" +
-    "						-\n" +
-    "						{{::event.formatedEndTime}}\n" +
+    "					<td ng-if=\"event.allDay\">\n" +
+    "						<div class=\"event-detail\"\n" +
+    "							 ng-style=\"{'background-color': event.color }\">O dia todo\n" +
+    "						</div>\n" +
     "					</td>\n" +
-    "					<td ng-if=\"event.allDay\" class=\"monthview-eventdetail-timecolumn\">O dia todo</td>\n" +
-    "					<td class=\"event-detail\">{{::event.summary}}</td>\n" +
+    "					<td ng-if=\"!event.allDay\">\n" +
+    "						<div class=\"event-detail\"\n" +
+    "							 ng-style=\"{'background-color': event.color }\">\n" +
+    "							<div>{{::event.summary}}</div>\n" +
+    "							<div>\n" +
+    "								{{::event.formatedStartTime}}\n" +
+    "								-\n" +
+    "								{{::event.formatedEndTime}}\n" +
+    "							</div>\n" +
+    "						</div>\n" +
+    "					</td>\n" +
     "				</tr>\n" +
     "\n" +
     "				<tr ng-if=\"!vm.selectedDate.events\">\n" +
-    "					<td class=\"no-event-label\" ng-bind=\"::noEventsLabel\"></td>\n" +
+    "					<td class=\"no-event-label\">\n" +
+    "						<div ng-bind=\"::vm.noEventsLabel\"></div>\n" +
+    "					</td>\n" +
     "				</tr>\n" +
     "			</table>\n" +
     "		</ion-content>\n" +
@@ -966,7 +984,7 @@ angular.module("src/month-day-tpls.html", []).run(["$templateCache", function($t
   $templateCache.put("src/month-day-tpls.html",
     "<td ng-click=\"onSelect()\"\n" +
     "	ng-class=\"getClasses()\">\n" +
-    "	<span class=\"datex\">{{day.label}}</span>\n" +
+    "	<span class=\"date-label\">{{day.label}}</span>\n" +
     "	<div class=\"pins\">\n" +
     "		<span class=\"pin\"\n" +
     "			  ng-style=\"{'background-color': source.color }\"\n" +

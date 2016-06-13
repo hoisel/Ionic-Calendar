@@ -40,7 +40,7 @@ angular.module( 'ui.rCalendar' ).constant( 'calendarConfig', {
     formatDay: 'dd',
     formatDayHeader: 'EEE',
     formatMonthTitle: 'MMMM yyyy',
-    formatHourColumn: 'HH:mm',
+    formatHourColumn: 'dd MMMM, HH:mm',
     showEventDetail: true,
     startingDayMonth: 0,
     startingDayWeek: 0,
@@ -326,14 +326,14 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
 
     vm.getHighlightClass = function( date ) {
         var className = '';
-
-        if ( date.hasEvent ) {
-            if ( date.secondary ) {
-                className = 'monthview-secondary-with-event';
-            } else {
-                className = 'monthview-primary-with-event';
-            }
-        }
+        /*
+         if ( date.hasEvent ) {
+         if ( date.secondary ) {
+         className = 'monthview-secondary-with-event';
+         } else {
+         className = 'monthview-primary-with-event';
+         }
+         }*/
 
         if ( date.selected ) {
             if ( className ) {
@@ -353,7 +353,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
             if ( className ) {
                 className += ' ';
             }
-            className += 'text-muted';
+            className += 'monthview-secondary';
         }
         return className;
     };
@@ -470,6 +470,14 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
                         et = endTime;
                     }
                 }
+
+                /*if ( eventStartTime.getDate() == eventEndTime.getDate() ) {
+                    event.formatedStartTime = dateFilter( eventStartTime, 'HH:mm' );
+                    event.formatedEndTime = dateFilter( eventEndTime, 'HH:mm' );
+                } else {
+                    event.formatedStartTime = dateFilter( eventStartTime, vm.formatHourColumn );
+                    event.formatedEndTime = dateFilter( eventEndTime, vm.formatHourColumn );
+                }*/
 
                 event.formatedStartTime = dateFilter( eventStartTime, vm.formatHourColumn );
                 event.formatedEndTime = dateFilter( eventEndTime, vm.formatHourColumn );

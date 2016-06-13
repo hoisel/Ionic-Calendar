@@ -1,247 +1,140 @@
-.nav-left {
-    text-align: left;
-}
-
-.nav-right {
-    text-align: right;
-}
-
-.scrollable {
-    width: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-}
-
 .calendar-container {
-    height: 100%;
+	height: 100%;
 }
 
-.text-muted {
-    color: #999;
+.calendar-container .table {
+	width: 100%;
+	max-width: 100%;
+	background-color: transparent;
 }
 
-.table-fixed {
-    table-layout: fixed;
+.calendar-container .table-fixed {
+	table-layout: fixed;
 }
 
-.table {
-    width: 100%;
-    max-width: 100%;
-    background-color: transparent;
+.calendar-container .table > thead > tr > th,
+.calendar-container .table > tbody > tr > th,
+.calendar-container .table > tfoot > tr > th,
+.calendar-container .table > thead > tr > td,
+.calendar-container .table > tbody > tr > td,
+.calendar-container .table > tfoot > tr > td {
+	padding: 4px;
+	line-height: 1.428571429;
+	vertical-align: top;
+	border: 1px solid rgba(0, 0, 0, .05);
 }
 
-.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td,
-.table > tbody > tr > td, .table > tfoot > tr > td {
-    padding: 8px;
-    line-height: 1.428571429;
-    vertical-align: top;
+.calendar-container .table > thead > tr > th {
+	vertical-align: bottom;
+	border-bottom: 2px solid #ddd;
 }
 
-.table > thead > tr > th {
-    vertical-align: bottom;
-    border-bottom: 2px solid #ddd;
+.calendar-container .table-bordered > thead > tr > th,
+.calendar-container .table-bordered > thead > tr > td {
+	border: none;
+	font-weight: bold;
 }
 
-.table > thead:first-child > tr:first-child > th, .table > thead:first-child > tr:first-child > td {
-    border-top: 0
+.calendar-container .table-bordered.monthview-datetable td {
+	position: relative;
+	height: 37px;
 }
 
-.table > tbody + tbody {
-    border-top: 2px solid #ddd;
+.calendar-container .table > thead:first-child > tr:first-child > th,
+.calendar-container.table > thead:first-child > tr:first-child > td {
+	border-top: 0
 }
 
-.table-bordered {
-    border: 1px solid #ddd;
+.calendar-container .table > tbody + tbody {
+	border-top: 2px solid #ddd;
 }
 
-.table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > th,
-.table-bordered > thead > tr > td, .table-bordered > tbody > tr > td, .table-bordered > tfoot > tr > td {
-    border: 1px solid #ddd;
+.calendar-container .pins {
+	position: absolute;
+	bottom: 2px;
+	left: 2px;
 }
 
-.table-bordered > thead > tr > th, .table-bordered > thead > tr > td {
-    border-bottom-width: 2px;
+.calendar-container .pin {
+	width: 4px;
+	height: 4px;
+	float: left;
+	border-radius: 3px;
+	margin: 1px;
 }
 
-.table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
-    background-color: #f9f9f9
+.calendar-container .event-detail-table .event-detail {
+	height: 60px;
+	color: #fff;
+	padding: 10px;
+	border-radius: 3px;
+	/*box-shadow: 0 1px 5px 0 rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.12);*/
 }
 
-.no-event-label {
-    font-weight: bold;
-    color: darkgrey;
-    text-align: center;
+.calendar-container .monthview-slide {
+	height: 306px;
 }
 
-.event-detail-container {
-    border-top: 2px darkgrey solid;
-    margin-top: 262px;
+.calendar-container .monthview-datetable th {
+	text-align: center;
 }
 
-.event-detail {
-    cursor: pointer;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+.calendar-container .monthview-datetable td {
+	cursor: pointer;
+	text-align: center;
 }
 
-.calendar-header {
-    text-align: center;
-    padding-top: 5px;
+.calendar-container .event-detail-container {
+	border-top: 2px darkgrey solid;
+	margin-top: 252px;
 }
 
-.calendar-hour-column {
-    width: 50px;
-    white-space: nowrap;
+.calendar-container .date-label {
+	position: absolute;
+	top: 0px;
+	right: 3px;
+	color: rgba(0, 0, 0, 0.54);
 }
 
-.calendar-event-wrap {
-    position: relative;
-    width: 100%;
-    height: 100%;
+.calendar-container .monthview-secondary {
+	background: #f7f7f7;
 }
 
-.calendar-event {
-    position: absolute;
-    padding: 2px;
-    cursor: pointer;
-    z-index: 10000;
+.calendar-container .monthview-secondary .date-label {
+	color: #a7a7a7;
 }
 
-.calendar-event-inner {
-    overflow: hidden;
-    background-color: #3a87ad;
-    color: white;
-    height: 100%;
-    width: 100%;
-    padding: 2px;
-    line-height: 15px;
+.calendar-container .monthview-selected {
+	background: #fff;
+	box-shadow: 0 7px 8px -4px rgba(0, 0, 0, .2), 0 12px 17px 2px rgba(0, 0, 0, .14), 0 5px 22px 4px rgba(0, 0, 0, .12);
 }
 
-.calendar-cell {
-    padding: 0 !important;
-    height: 37px;
+.calendar-container .monthview-selected .date-label {
+	color: #333;
 }
 
-.monthview-primary-with-event {
-    background-color: #3a87ad;
-    color: white;
+.calendar-container .day-header {
+	text-align: center;
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 15px;
 }
 
-.monthview-current {
-    background-color: lightgrey;
+.calendar-container .day-header .day-number {
+	font-size: 20px;
+	font-weight: 500;
+	letter-spacing: .005em;
+	color: rgba(0, 0, 0, 0.87);
 }
 
-.monthview-selected {
-    background-color: #009900;
-    color: white;
+.calendar-container .day-header .day-name {
+	font-size: 16px;
+	font-weight: 400;
+	letter-spacing: .010em;
+	line-height: 24px;
+	color: rgba(0, 0, 0, 0.54);
 }
 
-.monthview-eventdetail-timecolumn {
-    width: 110px;
-    overflow: hidden;
-}
-
-.monthview-datetable th {
-    text-align: center;
-}
-
-.monthview-datetable td {
-    cursor: pointer;
-    text-align: center;
-}
-
-.monthview-secondary-with-event {
-    background-color: #d9edf7;
-}
-
-.weekview-allday-label, .dayview-allday-label {
-    float: left;
-    height: 100%;
-    line-height: 50px;
-    text-align: center;
-    width: 50px;
-}
-
-.weekview-allday-content-wrapper, .dayview-allday-content-wrapper {
-    margin-left: 50px;
-    overflow: hidden;
-    height: 51px;
-}
-
-.weekview-allday-content-table, .dayview-allday-content-table {
-    min-height: 50px;
-}
-
-.weekview-allday-content-table td, .dayview-allday-content-table td {
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-}
-
-.monthview-slide {
-    height: 306px;
-}
-
-.weekview-slide, .weekview, .dayview-slide, .dayview {
-    height: 100%;
-}
-
-.weekview-header th {
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.weekview-allday-table, .dayview-allday-table {
-    height: 50px;
-    position: relative;
-    border-bottom: 1px solid #ddd;
-}
-
-.weekview-normal-event-container {
-    margin-top: 87px;
-    overflow: hidden;
-}
-
-.dayview-normal-event-container {
-    margin-top: 47px;
-    overflow: hidden;
-}
-
-@media (max-width: 750px) {
-    .weekview-allday-label, .dayview-allday-label, .calendar-hour-column {
-        width: 31px;
-        font-size: 12px;
-    }
-
-    .weekview-allday-label, .dayview-allday-label {
-        padding-top: 4px;
-    }
-
-    .weekview-normal-event-container {
-        margin-top: 83px;
-    }
-
-    .table > tbody > tr > td.calendar-hour-column {
-        padding-left: 0;
-        padding-right: 0;
-        vertical-align: middle;
-        line-height: 12px;
-    }
-
-    .table > thead > tr > th.weekview-header {
-        padding-left: 0;
-        padding-right: 0;
-        font-size: 12px;
-    }
-
-    .weekview-allday-label, .dayview-allday-label {
-        line-height: inherit;
-    }
-
-    .weekview-allday-content-wrapper, .dayview-allday-content-wrapper {
-        margin-left: 31px;
-    }
-
-    .calendar-event-inner {
-        font-size: 12px;
-    }
+.calendar-container .no-event-label {
+	text-align: center;
+	padding: 10px 0;
 }

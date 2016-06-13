@@ -178,6 +178,16 @@ function CalendarDemoController( $log ) {
                 } );
             }
         }
+
+        events.push( {
+            id: guid(),
+            etag: guid(),
+            summary: source + ' - Event dentro do dia',
+            startTime: new Date(),
+            endTime: new Date(),
+            allDay: false,
+            color: color
+        } );
         return events;
     }
 }
