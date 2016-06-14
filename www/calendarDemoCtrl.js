@@ -10,11 +10,7 @@ eventsService.$inject = [ '$http' ];
 appRun.$inject = [ '$ionicPlatform', '$animate' ];
 appConfig.$inject = [ '$stateProvider', '$urlRouterProvider' ];
 CalendarDemoController.$inject = [
-    '$scope',
-    '$log',
-    'eventsService',
-    'agendasService',
-    '$ionicLoading'
+    '$scope', '$log', 'eventsService', 'agendasService', '$ionicLoading'
 ];
 
 function agendasService( $http ) {

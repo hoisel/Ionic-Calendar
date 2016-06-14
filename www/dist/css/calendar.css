@@ -71,10 +71,6 @@
 	/*box-shadow: 0 1px 5px 0 rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.12);*/
 }
 
-.calendar-container .monthview-slide {
-	height: 306px;
-}
-
 .calendar-container .monthview-datetable th {
 	text-align: center;
 }
@@ -85,8 +81,10 @@
 }
 
 .calendar-container .event-detail-container {
-	border-top: 2px darkgrey solid;
-	margin-top: 252px;
+	border-top: 1px #ccc solid;
+	width: 100%;
+	height: -webkit-calc(100vh - 251px);
+	top: 251px;
 }
 
 .calendar-container .date-label {
@@ -134,7 +132,7 @@
 	color: rgba(0, 0, 0, 0.54);
 }
 
-.calendar-container .no-event-label {
+.calendar-container .table > tbody > tr > td.no-event-label {
 	text-align: center;
 	padding: 10px 0;
 }
