@@ -954,7 +954,8 @@ angular.module("src/calendar-tpls.html", []).run(["$templateCache", function($te
     "	<ion-content has-bouncing=\"false\"\n" +
     "				 ng-show=\"vm.showEventDetail\"\n" +
     "				 overflow-scroll=\"false\"\n" +
-    "				 class=\"event-detail-container\">\n" +
+    "				 class=\"event-detail-container\"\n" +
+    "				 delegate-handle=\"event-detail-container\">\n" +
     "		<!--<h3>{{vm.selectedDate.events.length}}</h3>-->\n" +
     "\n" +
     "		<table class=\"table table-fixed event-detail-table\">\n" +

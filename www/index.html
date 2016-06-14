@@ -54,9 +54,9 @@
 				</ion-nav-buttons>
 				<ion-content scroll="true"
 							 class="main-content">
-					<ion-refresher pulling-text="Atualizar..."
+					<!--<ion-refresher pulling-text="Atualizar..."
 								   spinner="none"
-								   on-refresh="vm.loadEvents()"></ion-refresher>
+								   on-refresh="vm.loadEvents()"></ion-refresher>-->
 					<calendar ng-model="vm.calendar.currentDate"
 							  event-sources="vm.calendar.eventSources"
 							  range-changed="vm.reloadSource(startTime, endTime)"

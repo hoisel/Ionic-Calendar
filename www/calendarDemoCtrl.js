@@ -10,7 +10,7 @@ eventsService.$inject = [ '$http' ];
 appRun.$inject = [ '$ionicPlatform', '$animate' ];
 appConfig.$inject = [ '$stateProvider', '$urlRouterProvider' ];
 CalendarDemoController.$inject = [
-    '$scope', '$log', 'eventsService', 'agendasService', '$ionicLoading'
+    '$scope', '$log', 'eventsService', 'agendasService', '$ionicLoading', '$ionicScrollDelegate'
 ];
 
 function agendasService( $http ) {
@@ -71,7 +71,7 @@ function appConfig( $stateProvider, $urlRouterProvider ) {
     $urlRouterProvider.otherwise( '/tab/home' );
 }
 
-function CalendarDemoController( $scope, $log, eventsService, agendasService, $ionicLoading ) {
+function CalendarDemoController( $scope, $log, eventsService, agendasService, $ionicLoading, $ionicScrollDelegate ) {
     'use strict';
 
     var i;
@@ -127,6 +127,7 @@ function CalendarDemoController( $scope, $log, eventsService, agendasService, $i
     };
 
     vm.onTimeSelected = function( selectedTime ) {
+        $ionicScrollDelegate.resize();
         $log.info( 'Selected time: ' + selectedTime );
     };
 

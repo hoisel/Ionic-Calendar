@@ -1,5 +1,6 @@
 .calendar-container {
 	height: 100%;
+	position: relative;
 }
 
 .calendar-container .table {
@@ -64,7 +65,7 @@
 }
 
 .calendar-container .event-detail-table .event-detail {
-	height: 60px;
+	min-height: 60px;
 	color: #fff;
 	padding: 10px;
 	border-radius: 3px;
@@ -83,7 +84,6 @@
 .calendar-container .event-detail-container {
 	border-top: 1px #ccc solid;
 	width: 100%;
-	height: -webkit-calc(100vh - 251px);
 	top: 251px;
 }
 
