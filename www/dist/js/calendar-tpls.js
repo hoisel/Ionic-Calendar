@@ -453,8 +453,15 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
 
             for ( i = 0; i < eventsLength; i += 1 ) {
                 event = eventSource.items[ i ];
-                eventStartTime = new Date( event.start.dateTime );
-                eventEndTime = new Date( event.end.dateTime );
+                event.allDay = !!event.start.date; // allday event if start.date exists
+
+                if ( event.allDay ) {
+                    eventStartTime = new Date( event.start.date );
+                    eventEndTime = new Date( event.end.date );
+                } else {
+                    eventStartTime = new Date( event.start.dateTime );
+                    eventEndTime = new Date( event.end.dateTime );
+                }
 
                 if ( event.allDay ) {
                     if ( eventEndTime <= utcStartTime || eventStartTime >= utcEndTime ) {
@@ -944,42 +951,42 @@ angular.module("src/calendar-tpls.html", []).run(["$templateCache", function($te
     "		</ion-slide>\n" +
     "	</ion-slide-box>\n" +
     "\n" +
-    "	<!--<div class=\"event-detail-container\">-->\n" +
-    "		<ion-content has-bouncing=\"false\"\n" +
-    "					 ng-show=\"vm.showEventDetail\"\n" +
-    "					 overflow-scroll=\"false\"\n" +
-    "					 class=\"event-detail-container\">\n" +
-    "			<!--<h3>{{vm.selectedDate.events.length}}</h3>-->\n" +
+    "	<ion-content has-bouncing=\"false\"\n" +
+    "				 ng-show=\"vm.showEventDetail\"\n" +
+    "				 overflow-scroll=\"false\"\n" +
+    "				 class=\"event-detail-container\">\n" +
+    "		<!--<h3>{{vm.selectedDate.events.length}}</h3>-->\n" +
     "\n" +
-    "			<table class=\"table table-fixed event-detail-table\">\n" +
-    "				<tr ng-repeat=\"event in vm.selectedDate.events track by event.id\"\n" +
-    "					ng-click=\"vm.eventSelected({event:event})\">\n" +
-    "					<td ng-if=\"event.allDay\">\n" +
-    "						<div class=\"event-detail\"\n" +
-    "							 ng-style=\"{'background-color': event.color }\">O dia todo\n" +
+    "		<table class=\"table table-fixed event-detail-table\">\n" +
+    "			<tr ng-repeat=\"event in vm.selectedDate.events track by event.id\"\n" +
+    "				ng-click=\"vm.eventSelected({event:event})\">\n" +
+    "				<td ng-if=\"event.allDay\">\n" +
+    "					<div class=\"event-detail\"\n" +
+    "						 ng-style=\"{'background-color': event.color }\">\n" +
+    "						<div>{{::event.source}} - {{::event.summary}}</div>\n" +
+    "						<div>O dia todo</div>\n" +
+    "					</div>\n" +
+    "				</td>\n" +
+    "				<td ng-if=\"!event.allDay\">\n" +
+    "					<div class=\"event-detail\"\n" +
+    "						 ng-style=\"{'background-color': event.color }\">\n" +
+    "						<div>{{::event.source}} - {{::event.summary}}</div>\n" +
+    "						<div>\n" +
+    "							{{::event.formatedStartTime}}\n" +
+    "							-\n" +
+    "							{{::event.formatedEndTime}}\n" +
     "						</div>\n" +
-    "					</td>\n" +
-    "					<td ng-if=\"!event.allDay\">\n" +
-    "						<div class=\"event-detail\"\n" +
-    "							 ng-style=\"{'background-color': event.color }\">\n" +
-    "							<div>{{::event.source}} - {{::event.summary}}</div>\n" +
-    "							<div>\n" +
-    "								{{::event.formatedStartTime}}\n" +
-    "								-\n" +
-    "								{{::event.formatedEndTime}}\n" +
-    "							</div>\n" +
-    "						</div>\n" +
-    "					</td>\n" +
-    "				</tr>\n" +
+    "					</div>\n" +
+    "				</td>\n" +
+    "			</tr>\n" +
     "\n" +
-    "				<tr ng-if=\"!vm.selectedDate.events\">\n" +
-    "					<td class=\"no-event-label\">\n" +
-    "						<div ng-bind=\"::vm.noEventsLabel\"></div>\n" +
-    "					</td>\n" +
-    "				</tr>\n" +
-    "			</table>\n" +
-    "		</ion-content>\n" +
-    "	<!--</div>-->\n" +
+    "			<tr ng-if=\"!vm.selectedDate.events\">\n" +
+    "				<td class=\"no-event-label\">\n" +
+    "					<div ng-bind=\"::vm.noEventsLabel\"></div>\n" +
+    "				</td>\n" +
+    "			</tr>\n" +
+    "		</table>\n" +
+    "	</ion-content>\n" +
     "</div>");
 }]);
 

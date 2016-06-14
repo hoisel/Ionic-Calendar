@@ -452,8 +452,15 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
 
             for ( i = 0; i < eventsLength; i += 1 ) {
                 event = eventSource.items[ i ];
-                eventStartTime = new Date( event.start.dateTime );
-                eventEndTime = new Date( event.end.dateTime );
+                event.allDay = !!event.start.date; // allday event if start.date exists
+
+                if ( event.allDay ) {
+                    eventStartTime = new Date( event.start.date );
+                    eventEndTime = new Date( event.end.date );
+                } else {
+                    eventStartTime = new Date( event.start.dateTime );
+                    eventEndTime = new Date( event.end.dateTime );
+                }
 
                 if ( event.allDay ) {
                     if ( eventEndTime <= utcStartTime || eventStartTime >= utcEndTime ) {
