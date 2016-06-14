@@ -61,13 +61,15 @@ CalendarController.$inject = [
     'dateFilter',
     'calendarConfig',
     '$timeout',
-    '$ionicSlideBoxDelegate'
+    '$ionicSlideBoxDelegate',
+    '$ionicScrollDelegate'
 ];
 
-function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFilter, calendarConfig, $timeout, $ionicSlideBoxDelegate ) {
+function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFilter, calendarConfig, $timeout, $ionicSlideBoxDelegate, $ionicScrollDelegate ) {
     'use strict';
     var vm = this;
     var ngModelCtrl = { $setViewValue: angular.noop }; // nullModelCtrl;
+    var ionicScrollHandle = $ionicScrollDelegate.$getByHandle( 'event-detail-container' );
 
     // Configuration attributes
     angular.forEach( [
@@ -313,6 +315,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
                 if ( selectedDayDifference >= 0 && selectedDayDifference < 42 ) {
                     dates[ selectedDayDifference ].selected = true;
                     vm.selectedDate = dates[ selectedDayDifference ];
+                    ionicScrollHandle.resize();
                 }
             } else {
                 vm.moveOnSelected = true;
@@ -537,6 +540,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
             if ( dates[ r ].selected ) {
                 vm.selectedDate = dates[ r ];
                 findSelected = true;
+                ionicScrollHandle.resize();
                 break;
             }
             if ( findSelected ) {
@@ -604,10 +608,12 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         if ( selectedDayDifference >= 0 && selectedDayDifference < 42 ) {
             view.dates[ selectedDayDifference ].selected = true;
             vm.selectedDate = view.dates[ selectedDayDifference ];
+            ionicScrollHandle.resize();
         } else {
             vm.selectedDate = {
                 events: []
             };
+            ionicScrollHandle.resize();
         }
 
         if ( currentDayDifference >= 0 && currentDayDifference < 42 ) {
@@ -954,7 +960,8 @@ angular.module("src/calendar-tpls.html", []).run(["$templateCache", function($te
     "	<ion-content has-bouncing=\"false\"\n" +
     "				 ng-show=\"vm.showEventDetail\"\n" +
     "				 overflow-scroll=\"false\"\n" +
-    "				 class=\"event-detail-container\">\n" +
+    "				 class=\"event-detail-container\"\n" +
+    "				 delegate-handle=\"event-detail-container\">\n" +
     "		<!--<h3>{{vm.selectedDate.events.length}}</h3>-->\n" +
     "\n" +
     "		<table class=\"table table-fixed event-detail-table\">\n" +
