@@ -1,344 +1,343 @@
 <div class="calendar-container">
-	<div>
-		<ion-slide-box class="monthview-slide"
-					   on-slide-changed="vm.slideChanged($index)"
-					   does-continue="true"
-					   show-pager="false"
-					   delegate-handle="monthview-slide">
-			<ion-slide ng-repeat="view in vm.views track by $index">
-				<table ng-if="$index===vm.currentViewIndex" class="table table-bordered table-fixed monthview-datetable">
-					<thead>
-					<tr>
-						<th ng-repeat="day in view.dates.slice(0,7) track by day.date">
-							<small>{{::day.formatedDayHeader}}</small>
-						</th>
-					</tr>
-					</thead>
-					<tbody>
-					<tr>
-						<td day="view.dates[0]"
-							on-select="vm.select(view.dates[0].date)"
-							get-classes="vm.getHighlightClass(view.dates[0])">
-						</td>
-						<td day="view.dates[1]"
-							on-select="vm.select(view.dates[1].date)"
-							get-classes="vm.getHighlightClass(view.dates[1])">
-						</td>
-						<td day="view.dates[2]"
-							on-select="vm.select(view.dates[2].date)"
-							get-classes="vm.getHighlightClass(view.dates[2])">
-						</td>
-						<td day="view.dates[3]"
-							on-select="vm.select(view.dates[3].date)"
-							get-classes="vm.getHighlightClass(view.dates[3])">
-						</td>
-						<td day="view.dates[4]"
-							on-select="vm.select(view.dates[4].date)"
-							get-classes="vm.getHighlightClass(view.dates[4])">
-						</td>
-						<td day="view.dates[5]"
-							on-select="vm.select(view.dates[5].date)"
-							get-classes="vm.getHighlightClass(view.dates[5])">
-						</td>
-						<td day="view.dates[6]"
-							on-select="vm.select(view.dates[6].date)"
-							get-classes="vm.getHighlightClass(view.dates[6])">
-						</td>
-					</tr>
-					<tr>
-						<td day="view.dates[7]"
-							on-select="vm.select(view.dates[7].date)"
-							get-classes="vm.getHighlightClass(view.dates[7])">
-						</td>
-						<td day="view.dates[8]"
-							on-select="vm.select(view.dates[8].date)"
-							get-classes="vm.getHighlightClass(view.dates[8])">
-						</td>
-						<td day="view.dates[9]"
-							on-select="vm.select(view.dates[9].date)"
-							get-classes="vm.getHighlightClass(view.dates[9])">
-						</td>
-						<td day="view.dates[10]"
-							on-select="vm.select(view.dates[10].date)"
-							get-classes="vm.getHighlightClass(view.dates[10])">
-						</td>
-						<td day="view.dates[11]"
-							on-select="vm.select(view.dates[11].date)"
-							get-classes="vm.getHighlightClass(view.dates[11])">
-						</td>
-						<td day="view.dates[12]"
-							on-select="vm.select(view.dates[12].date)"
-							get-classes="vm.getHighlightClass(view.dates[12])">
-						</td>
-						<td day="view.dates[13]"
-							on-select="vm.select(view.dates[13].date)"
-							get-classes="vm.getHighlightClass(view.dates[13])">
-						</td>
-					</tr>
-					<tr>
-						<td day="view.dates[14]"
-							on-select="vm.select(view.dates[14].date)"
-							get-classes="vm.getHighlightClass(view.dates[14])">
-						</td>
-						<td day="view.dates[15]"
-							on-select="vm.select(view.dates[15].date)"
-							get-classes="vm.getHighlightClass(view.dates[15])">
-						</td>
-						<td day="view.dates[16]"
-							on-select="vm.select(view.dates[16].date)"
-							get-classes="vm.getHighlightClass(view.dates[16])">
-						</td>
-						<td day="view.dates[17]"
-							on-select="vm.select(view.dates[17].date)"
-							get-classes="vm.getHighlightClass(view.dates[17])">
-						</td>
-						<td day="view.dates[18]"
-							on-select="vm.select(view.dates[18].date)"
-							get-classes="vm.getHighlightClass(view.dates[18])">
-						</td>
-						<td day="view.dates[19]"
-							on-select="vm.select(view.dates[19].date)"
-							get-classes="vm.getHighlightClass(view.dates[19])">
-						</td>
-						<td day="view.dates[20]"
-							on-select="vm.select(view.dates[20].date)"
-							get-classes="vm.getHighlightClass(view.dates[20])">
-						</td>
-					</tr>
-					<tr>
-						<td day="view.dates[21]"
-							on-select="vm.select(view.dates[21].date)"
-							get-classes="vm.getHighlightClass(view.dates[21])">
-						</td>
-						<td day="view.dates[22]"
-							on-select="vm.select(view.dates[22].date)"
-							get-classes="vm.getHighlightClass(view.dates[22])">
-						</td>
-						<td day="view.dates[23]"
-							on-select="vm.select(view.dates[23].date)"
-							get-classes="vm.getHighlightClass(view.dates[23])">
-						</td>
-						<td day="view.dates[24]"
-							on-select="vm.select(view.dates[24].date)"
-							get-classes="vm.getHighlightClass(view.dates[24])">
-						</td>
-						<td day="view.dates[25]"
-							on-select="vm.select(view.dates[25].date)"
-							get-classes="vm.getHighlightClass(view.dates[25])">
-						</td>
-						<td day="view.dates[26]"
-							on-select="vm.select(view.dates[26].date)"
-							get-classes="vm.getHighlightClass(view.dates[26])">
-						</td>
-						<td day="view.dates[27]"
-							on-select="vm.select(view.dates[27].date)"
-							get-classes="vm.getHighlightClass(view.dates[27])">
-						</td>
-					</tr>
-					<tr>
-						<td day="view.dates[28]"
-							on-select="vm.select(view.dates[28].date)"
-							get-classes="vm.getHighlightClass(view.dates[28])">
-						</td>
-						<td day="view.dates[29]"
-							on-select="vm.select(view.dates[29].date)"
-							get-classes="vm.getHighlightClass(view.dates[29])">
-						</td>
-						<td day="view.dates[30]"
-							on-select="vm.select(view.dates[30].date)"
-							get-classes="vm.getHighlightClass(view.dates[30])">
-						</td>
-						<td day="view.dates[31]"
-							on-select="vm.select(view.dates[31].date)"
-							get-classes="vm.getHighlightClass(view.dates[31])">
-						</td>
-						<td day="view.dates[32]"
-							on-select="vm.select(view.dates[32].date)"
-							get-classes="vm.getHighlightClass(view.dates[32])">
-						</td>
-						<td day="view.dates[33]"
-							on-select="vm.select(view.dates[33].date)"
-							get-classes="vm.getHighlightClass(view.dates[33])">
-						</td>
-						<td day="view.dates[34]"
-							on-select="vm.select(view.dates[34].date)"
-							get-classes="vm.getHighlightClass(view.dates[34])">
-						</td>
-					</tr>
-					<tr>
-						<td day="view.dates[35]"
-							on-select="vm.select(view.dates[35].date)"
-							get-classes="vm.getHighlightClass(view.dates[35])">
-						</td>
-						<td day="view.dates[36]"
-							on-select="vm.select(view.dates[36].date)"
-							get-classes="vm.getHighlightClass(view.dates[36])">
-						</td>
-						<td day="view.dates[37]"
-							on-select="vm.select(view.dates[37].date)"
-							get-classes="vm.getHighlightClass(view.dates[37])">
-						</td>
-						<td day="view.dates[38]"
-							on-select="vm.select(view.dates[38].date)"
-							get-classes="vm.getHighlightClass(view.dates[38])">
-						</td>
-						<td day="view.dates[39]"
-							on-select="vm.select(view.dates[39].date)"
-							get-classes="vm.getHighlightClass(view.dates[39])">
-						</td>
-						<td day="view.dates[40]"
-							on-select="vm.select(view.dates[40].date)"
-							get-classes="vm.getHighlightClass(view.dates[40])">
-						</td>
-						<td day="view.dates[41]"
-							on-select="vm.select(view.dates[41].date)"
-							get-classes="vm.getHighlightClass(view.dates[41])">
-						</td>
-					</tr>
-					</tbody>
-				</table>
-				<table ng-if="$index!==vm.currentViewIndex" class="table table-bordered table-fixed monthview-datetable">
-					<thead>
-					<tr class="text-center">
-						<th ng-repeat="day in view.dates.slice(0,7) track by day.date">
-							<small>{{::day.formatedDayHeader}}</small>
-						</th>
-					</tr>
-					</thead>
-					<tbody>
-					<tr>
-						<td day="view.dates[0]">
-						</td>
-						<td day="view.dates[1]">
-						</td>
-						<td day="view.dates[2]">
-						</td>
-						<td day="view.dates[3]">
-						</td>
-						<td day="view.dates[4]">
-						</td>
-						<td day="view.dates[5]">
-						</td>
-						<td day="view.dates[6]">
-						</td>
-					</tr>
-					<tr>
-						<td day="view.dates[7]">
-						</td>
-						<td day="view.dates[8]">
-						</td>
-						<td day="view.dates[9]">
-						</td>
-						<td day="view.dates[10]">
-						</td>
-						<td day="view.dates[11]">
-						</td>
-						<td day="view.dates[12]">
-						</td>
-						<td day="view.dates[13]">
-						</td>
-					</tr>
-					<tr>
-						<td day="view.dates[14]">
-						</td>
-						<td day="view.dates[15]">
-						</td>
-						<td day="view.dates[16]">
-						</td>
-						<td day="view.dates[17]">
-						</td>
-						<td day="view.dates[18]">
-						</td>
-						<td day="view.dates[19]">
-						</td>
-						<td day="view.dates[20]">
-						</td>
-					</tr>
-					<tr>
-						<td day="view.dates[21]">
-						</td>
-						<td day="view.dates[22]">
-						</td>
-						<td day="view.dates[23]">
-						</td>
-						<td day="view.dates[24]">
-						</td>
-						<td day="view.dates[25]">
-						</td>
-						<td day="view.dates[26]">
-						</td>
-						<td day="view.dates[27]">
-						</td>
-					</tr>
-					<tr>
-						<td day="view.dates[28]">
-						</td>
-						<td day="view.dates[29]">
-						</td>
-						<td day="view.dates[30]">
-						</td>
-						<td day="view.dates[31]">
-						</td>
-						<td day="view.dates[32]">
-						</td>
-						<td day="view.dates[33]">
-						</td>
-						<td day="view.dates[34]">
-						</td>
-					</tr>
-					<tr>
-						<td day="view.dates[35]">
-						</td>
-						<td day="view.dates[36]">
-						</td>
-						<td day="view.dates[37]">
-						</td>
-						<td day="view.dates[38]">
-						</td>
-						<td day="view.dates[39]">
-						</td>
-						<td day="view.dates[40]">
-						</td>
-						<td day="view.dates[41]">
-						</td>
-					</tr>
-					</tbody>
-				</table>
-			</ion-slide>
-		</ion-slide-box>
-		<ion-content class="event-detail-container"
-					 has-bouncing="false"
-					 ng-show="vm.showEventDetail"
-					 overflow-scroll="false">
-			<!--<h3>{{vm.selectedDate.events.length}}</h3>-->
 
-			<table class="table table-fixed event-detail-table">
-				<tr ng-repeat="event in vm.selectedDate.events track by event.id"
-					ng-click="vm.eventSelected({event:event})">
-					<td ng-if="event.allDay">
-						<div class="event-detail"
-							 ng-style="{'background-color': event.color }">O dia todo
-						</div>
+	<ion-slide-box on-slide-changed="vm.slideChanged($index)"
+				   does-continue="true"
+				   show-pager="false"
+				   delegate-handle="monthview-slide">
+		<ion-slide ng-repeat="view in vm.views track by $index">
+			<table ng-if="$index===vm.currentViewIndex" class="table table-bordered table-fixed monthview-datetable">
+				<thead>
+				<tr>
+					<th ng-repeat="day in view.dates.slice(0,7) track by day.date">
+						<small>{{::day.formatedDayHeader}}</small>
+					</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td day="view.dates[0]"
+						on-select="vm.select(view.dates[0].date)"
+						get-classes="vm.getHighlightClass(view.dates[0])">
 					</td>
-					<td ng-if="!event.allDay">
-						<div class="event-detail"
-							 ng-style="{'background-color': event.color }">
-							<div>{{::event.source}} - {{::event.summary}}</div>
-							<div>
-								{{::event.formatedStartTime}}
-								-
-								{{::event.formatedEndTime}}
-							</div>
-						</div>
+					<td day="view.dates[1]"
+						on-select="vm.select(view.dates[1].date)"
+						get-classes="vm.getHighlightClass(view.dates[1])">
+					</td>
+					<td day="view.dates[2]"
+						on-select="vm.select(view.dates[2].date)"
+						get-classes="vm.getHighlightClass(view.dates[2])">
+					</td>
+					<td day="view.dates[3]"
+						on-select="vm.select(view.dates[3].date)"
+						get-classes="vm.getHighlightClass(view.dates[3])">
+					</td>
+					<td day="view.dates[4]"
+						on-select="vm.select(view.dates[4].date)"
+						get-classes="vm.getHighlightClass(view.dates[4])">
+					</td>
+					<td day="view.dates[5]"
+						on-select="vm.select(view.dates[5].date)"
+						get-classes="vm.getHighlightClass(view.dates[5])">
+					</td>
+					<td day="view.dates[6]"
+						on-select="vm.select(view.dates[6].date)"
+						get-classes="vm.getHighlightClass(view.dates[6])">
 					</td>
 				</tr>
-
-				<tr ng-if="!vm.selectedDate.events">
-					<td class="no-event-label">
-						<div ng-bind="::vm.noEventsLabel"></div>
+				<tr>
+					<td day="view.dates[7]"
+						on-select="vm.select(view.dates[7].date)"
+						get-classes="vm.getHighlightClass(view.dates[7])">
+					</td>
+					<td day="view.dates[8]"
+						on-select="vm.select(view.dates[8].date)"
+						get-classes="vm.getHighlightClass(view.dates[8])">
+					</td>
+					<td day="view.dates[9]"
+						on-select="vm.select(view.dates[9].date)"
+						get-classes="vm.getHighlightClass(view.dates[9])">
+					</td>
+					<td day="view.dates[10]"
+						on-select="vm.select(view.dates[10].date)"
+						get-classes="vm.getHighlightClass(view.dates[10])">
+					</td>
+					<td day="view.dates[11]"
+						on-select="vm.select(view.dates[11].date)"
+						get-classes="vm.getHighlightClass(view.dates[11])">
+					</td>
+					<td day="view.dates[12]"
+						on-select="vm.select(view.dates[12].date)"
+						get-classes="vm.getHighlightClass(view.dates[12])">
+					</td>
+					<td day="view.dates[13]"
+						on-select="vm.select(view.dates[13].date)"
+						get-classes="vm.getHighlightClass(view.dates[13])">
 					</td>
 				</tr>
+				<tr>
+					<td day="view.dates[14]"
+						on-select="vm.select(view.dates[14].date)"
+						get-classes="vm.getHighlightClass(view.dates[14])">
+					</td>
+					<td day="view.dates[15]"
+						on-select="vm.select(view.dates[15].date)"
+						get-classes="vm.getHighlightClass(view.dates[15])">
+					</td>
+					<td day="view.dates[16]"
+						on-select="vm.select(view.dates[16].date)"
+						get-classes="vm.getHighlightClass(view.dates[16])">
+					</td>
+					<td day="view.dates[17]"
+						on-select="vm.select(view.dates[17].date)"
+						get-classes="vm.getHighlightClass(view.dates[17])">
+					</td>
+					<td day="view.dates[18]"
+						on-select="vm.select(view.dates[18].date)"
+						get-classes="vm.getHighlightClass(view.dates[18])">
+					</td>
+					<td day="view.dates[19]"
+						on-select="vm.select(view.dates[19].date)"
+						get-classes="vm.getHighlightClass(view.dates[19])">
+					</td>
+					<td day="view.dates[20]"
+						on-select="vm.select(view.dates[20].date)"
+						get-classes="vm.getHighlightClass(view.dates[20])">
+					</td>
+				</tr>
+				<tr>
+					<td day="view.dates[21]"
+						on-select="vm.select(view.dates[21].date)"
+						get-classes="vm.getHighlightClass(view.dates[21])">
+					</td>
+					<td day="view.dates[22]"
+						on-select="vm.select(view.dates[22].date)"
+						get-classes="vm.getHighlightClass(view.dates[22])">
+					</td>
+					<td day="view.dates[23]"
+						on-select="vm.select(view.dates[23].date)"
+						get-classes="vm.getHighlightClass(view.dates[23])">
+					</td>
+					<td day="view.dates[24]"
+						on-select="vm.select(view.dates[24].date)"
+						get-classes="vm.getHighlightClass(view.dates[24])">
+					</td>
+					<td day="view.dates[25]"
+						on-select="vm.select(view.dates[25].date)"
+						get-classes="vm.getHighlightClass(view.dates[25])">
+					</td>
+					<td day="view.dates[26]"
+						on-select="vm.select(view.dates[26].date)"
+						get-classes="vm.getHighlightClass(view.dates[26])">
+					</td>
+					<td day="view.dates[27]"
+						on-select="vm.select(view.dates[27].date)"
+						get-classes="vm.getHighlightClass(view.dates[27])">
+					</td>
+				</tr>
+				<tr>
+					<td day="view.dates[28]"
+						on-select="vm.select(view.dates[28].date)"
+						get-classes="vm.getHighlightClass(view.dates[28])">
+					</td>
+					<td day="view.dates[29]"
+						on-select="vm.select(view.dates[29].date)"
+						get-classes="vm.getHighlightClass(view.dates[29])">
+					</td>
+					<td day="view.dates[30]"
+						on-select="vm.select(view.dates[30].date)"
+						get-classes="vm.getHighlightClass(view.dates[30])">
+					</td>
+					<td day="view.dates[31]"
+						on-select="vm.select(view.dates[31].date)"
+						get-classes="vm.getHighlightClass(view.dates[31])">
+					</td>
+					<td day="view.dates[32]"
+						on-select="vm.select(view.dates[32].date)"
+						get-classes="vm.getHighlightClass(view.dates[32])">
+					</td>
+					<td day="view.dates[33]"
+						on-select="vm.select(view.dates[33].date)"
+						get-classes="vm.getHighlightClass(view.dates[33])">
+					</td>
+					<td day="view.dates[34]"
+						on-select="vm.select(view.dates[34].date)"
+						get-classes="vm.getHighlightClass(view.dates[34])">
+					</td>
+				</tr>
+				<tr>
+					<td day="view.dates[35]"
+						on-select="vm.select(view.dates[35].date)"
+						get-classes="vm.getHighlightClass(view.dates[35])">
+					</td>
+					<td day="view.dates[36]"
+						on-select="vm.select(view.dates[36].date)"
+						get-classes="vm.getHighlightClass(view.dates[36])">
+					</td>
+					<td day="view.dates[37]"
+						on-select="vm.select(view.dates[37].date)"
+						get-classes="vm.getHighlightClass(view.dates[37])">
+					</td>
+					<td day="view.dates[38]"
+						on-select="vm.select(view.dates[38].date)"
+						get-classes="vm.getHighlightClass(view.dates[38])">
+					</td>
+					<td day="view.dates[39]"
+						on-select="vm.select(view.dates[39].date)"
+						get-classes="vm.getHighlightClass(view.dates[39])">
+					</td>
+					<td day="view.dates[40]"
+						on-select="vm.select(view.dates[40].date)"
+						get-classes="vm.getHighlightClass(view.dates[40])">
+					</td>
+					<td day="view.dates[41]"
+						on-select="vm.select(view.dates[41].date)"
+						get-classes="vm.getHighlightClass(view.dates[41])">
+					</td>
+				</tr>
+				</tbody>
 			</table>
-		</ion-content>
-	</div>
+			<table ng-if="$index!==vm.currentViewIndex" class="table table-bordered table-fixed monthview-datetable">
+				<thead>
+				<tr class="text-center">
+					<th ng-repeat="day in view.dates.slice(0,7) track by day.date">
+						<small>{{::day.formatedDayHeader}}</small>
+					</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td day="view.dates[0]">
+					</td>
+					<td day="view.dates[1]">
+					</td>
+					<td day="view.dates[2]">
+					</td>
+					<td day="view.dates[3]">
+					</td>
+					<td day="view.dates[4]">
+					</td>
+					<td day="view.dates[5]">
+					</td>
+					<td day="view.dates[6]">
+					</td>
+				</tr>
+				<tr>
+					<td day="view.dates[7]">
+					</td>
+					<td day="view.dates[8]">
+					</td>
+					<td day="view.dates[9]">
+					</td>
+					<td day="view.dates[10]">
+					</td>
+					<td day="view.dates[11]">
+					</td>
+					<td day="view.dates[12]">
+					</td>
+					<td day="view.dates[13]">
+					</td>
+				</tr>
+				<tr>
+					<td day="view.dates[14]">
+					</td>
+					<td day="view.dates[15]">
+					</td>
+					<td day="view.dates[16]">
+					</td>
+					<td day="view.dates[17]">
+					</td>
+					<td day="view.dates[18]">
+					</td>
+					<td day="view.dates[19]">
+					</td>
+					<td day="view.dates[20]">
+					</td>
+				</tr>
+				<tr>
+					<td day="view.dates[21]">
+					</td>
+					<td day="view.dates[22]">
+					</td>
+					<td day="view.dates[23]">
+					</td>
+					<td day="view.dates[24]">
+					</td>
+					<td day="view.dates[25]">
+					</td>
+					<td day="view.dates[26]">
+					</td>
+					<td day="view.dates[27]">
+					</td>
+				</tr>
+				<tr>
+					<td day="view.dates[28]">
+					</td>
+					<td day="view.dates[29]">
+					</td>
+					<td day="view.dates[30]">
+					</td>
+					<td day="view.dates[31]">
+					</td>
+					<td day="view.dates[32]">
+					</td>
+					<td day="view.dates[33]">
+					</td>
+					<td day="view.dates[34]">
+					</td>
+				</tr>
+				<tr>
+					<td day="view.dates[35]">
+					</td>
+					<td day="view.dates[36]">
+					</td>
+					<td day="view.dates[37]">
+					</td>
+					<td day="view.dates[38]">
+					</td>
+					<td day="view.dates[39]">
+					</td>
+					<td day="view.dates[40]">
+					</td>
+					<td day="view.dates[41]">
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</ion-slide>
+	</ion-slide-box>
+
+	<ion-content has-bouncing="false"
+				 ng-show="vm.showEventDetail"
+				 overflow-scroll="false"
+				 class="event-detail-container">
+		<!--<h3>{{vm.selectedDate.events.length}}</h3>-->
+
+		<table class="table table-fixed event-detail-table">
+			<tr ng-repeat="event in vm.selectedDate.events track by event.id"
+				ng-click="vm.eventSelected({event:event})">
+				<td ng-if="event.allDay">
+					<div class="event-detail"
+						 ng-style="{'background-color': event.color }">O dia todo
+					</div>
+				</td>
+				<td ng-if="!event.allDay">
+					<div class="event-detail"
+						 ng-style="{'background-color': event.color }">
+						<div>{{::event.source}} - {{::event.summary}}</div>
+						<div>
+							{{::event.formatedStartTime}}
+							-
+							{{::event.formatedEndTime}}
+						</div>
+					</div>
+				</td>
+			</tr>
+
+			<tr ng-if="!vm.selectedDate.events">
+				<td class="no-event-label">
+					<div ng-bind="::vm.noEventsLabel"></div>
+				</td>
+			</tr>
+		</table>
+	</ion-content>
 </div>
