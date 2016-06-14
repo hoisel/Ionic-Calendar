@@ -317,7 +317,9 @@
 				ng-click="vm.eventSelected({event:event})">
 				<td ng-if="event.allDay">
 					<div class="event-detail"
-						 ng-style="{'background-color': event.color }">O dia todo
+						 ng-style="{'background-color': event.color }">
+						<div>{{::event.source}} - {{::event.summary}}</div>
+						<div>O dia todo</div>
 					</div>
 				</td>
 				<td ng-if="!event.allDay">
