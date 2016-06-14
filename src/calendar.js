@@ -141,7 +141,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
 
             vm.populateAdjacentViews();
             updateCurrentView( vm.range.startTime, vm.views[ vm.currentViewIndex ] );
-            vm.rangeChanged();
+            rangeChanged();
         }
     };
 
@@ -177,7 +177,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         vm.direction = 0;
     };
 
-    vm.rangeChanged = function() {
+    function rangeChanged() {
         if ( vm.queryMode === 'local' ) {
             if ( vm.eventSources && onDataLoaded ) {
                 onDataLoaded();
@@ -190,7 +190,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
                 } );
             }
         }
-    };
+    }
 
     vm.registerSlideChanged = function() {
         vm.currentViewIndex = 0;
@@ -363,7 +363,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
 
     vm.registerSlideChanged();
 
-    vm.refreshView();
+    //vm.refreshView();
 
     ////////////////////////////////////////////////////////////////////////////////////
 

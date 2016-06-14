@@ -51,15 +51,25 @@
 				<ion-nav-buttons side="right">
 					<button class="button" ng-disabled="vm.isToday()" ng-click="vm.today()">Hoje</button>
 					<button class="button" ng-click="vm.loadEvents()">Carregar Eventos</button>
+
 				</ion-nav-buttons>
 				<ion-content scroll="true"
 							 class="main-content">
 					<!--<ion-refresher pulling-text="Atualizar..."
 								   spinner="none"
 								   on-refresh="vm.loadEvents()"></ion-refresher>-->
+
+					<label class="item item-input item-select">
+						<div class="input-label">
+							Agendas
+						</div>
+						<select ng-model='vm.agendasSelecionadas'
+								ng-change="vm.loadEvents()"
+								ng-options='agenda for agenda in vm.eventSourcesList'></select>
+					</label>
 					<calendar ng-model="vm.calendar.currentDate"
 							  event-sources="vm.calendar.eventSources"
-							  range-changed="vm.reloadSource(startTime, endTime)"
+							  range-changed="vm.loadEvents(startTime, endTime)"
 							  event-selected="vm.onEventSelected(event)"
 							  title-changed="vm.onViewTitleChanged(title)"
 							  time-selected="vm.onTimeSelected(selectedTime)"></calendar>

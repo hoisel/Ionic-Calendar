@@ -10,7 +10,7 @@ eventsService.$inject = [ '$http' ];
 appRun.$inject = [ '$ionicPlatform', '$animate' ];
 appConfig.$inject = [ '$stateProvider', '$urlRouterProvider' ];
 CalendarDemoController.$inject = [
-    '$scope', '$log', 'eventsService', 'agendasService', '$ionicLoading'
+    '$log', 'eventsService', 'agendasService', '$ionicLoading'
 ];
 
 function agendasService( $http ) {
@@ -24,8 +24,16 @@ function agendasService( $http ) {
 function eventsService( $http ) {
     var urlBase = 'http://10.243.9.4/events';
 
-    this.getEventsFor = function( agendas ) {
-        return $http.get( urlBase, { params: { agendas: agendas } } );
+    this.getEventsFor = function( agendas, options ) {
+        var hoje = new Date();
+        var defaults = {
+            singleEvents: true,
+            orderBy: 'startTime',
+            timeMin: new Date( hoje.getFullYear(), 0, 1, 0 ),   // começo do ano corrente
+            timeMax: new Date( hoje.getFullYear(), 11, 31, 0 ), // final do ano corrente
+            timeZone: 'America/Sao_Paulo' // an option!
+        };
+        return $http.get( urlBase, { params: angular.extend( { agendas: agendas }, defaults, options || {} ) } );
     };
 }
 
@@ -71,37 +79,34 @@ function appConfig( $stateProvider, $urlRouterProvider ) {
     $urlRouterProvider.otherwise( '/tab/home' );
 }
 
-function CalendarDemoController( $scope, $log, eventsService, agendasService, $ionicLoading ) {
+function CalendarDemoController( $log, eventsService, agendasService, $ionicLoading ) {
     'use strict';
 
-    var i;
     var vm = this;
-    var colors = new Array( 100 );
-
-    for ( i = 0; i < colors.length; i += 1 ) {
-        colors[ i ] = '#' + ( Math.random() * 0xFFFFFF << 0 ).toString( 16 );
-    }
-
+    vm.agendasSelecionadas = [];
     vm.calendar = {};
     vm.loadAgendas = function() {
         $ionicLoading.show( { delay: 300 } );
-        agendasService.getAll()
-                      .then( function( response ) {
-                          $ionicLoading.hide();
-                          vm.eventSourcesList = response.data;
-                      } );
+        return agendasService.getAll()
+                             .then( function( response ) {
+                                 $ionicLoading.hide();
+                                 vm.eventSourcesList = vm.agendasSelecionadas = response.data.map( function( agenda ) {
+                                     return agenda.nome;
+                                 } );
+                             } );
     };
 
     vm.loadEvents = function() {
         $ionicLoading.show( { delay: 300 } );
-        eventsService.getEventsFor( [ 'SESA', 'SEFAZ', 'SEDU', 'PRODEST' ] )
-                     .then( function( response ) {
-                         vm.calendar.eventSources = response.data;
-                     } )
-                     .finally( function() {
-                         $ionicLoading.hide();
-                         $scope.$broadcast( 'scroll.refreshComplete' );
-                     } );
+
+        // final do ano corrente
+        return eventsService.getEventsFor( vm.agendasSelecionadas )
+                            .then( function( response ) {
+                                vm.calendar.eventSources = response.data;
+                            } )
+                            .finally( function() {
+                                $ionicLoading.hide();
+                            } );
 
     };
 
@@ -130,77 +135,7 @@ function CalendarDemoController( $scope, $log, eventsService, agendasService, $i
         $log.info( 'Selected time: ' + selectedTime );
     };
 
-    vm.loadEvents();
-    ///////////////////////////////////////////////////////////////////////
-
-    /*function guid() {
-     function s4() {
-     return Math.floor( ( 1 + Math.random() ) * 0x10000 )
-     .toString( 16 )
-     .substring( 1 );
-     }
-
-     return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-     }
-     */
-    /*function createRandomEvents( source, numOfEvents, color ) {
-     var events = [];
-     var date;
-     var eventType;
-     var startDay;
-     var endDay;
-     var startTime;
-     var endTime;
-     var i;
-     var startMinute;
-     var endMinute;
-
-     for ( i = 0; i < numOfEvents; i += 1 ) {
-     date = new Date();
-     eventType = Math.floor( Math.random() * 2 );
-     startDay = Math.floor( Math.random() * 90 ) - 45;
-     endDay = Math.floor( Math.random() * 2 ) + startDay;
-
-     if ( eventType === 0 ) {
-     startTime = new Date( Date.UTC( date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + startDay ) );
-     if ( endDay === startDay ) {
-     endDay += 1;
-     }
-     endTime = new Date( Date.UTC( date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + endDay ) );
-     events.push( {
-     summary: source + ' - Event ' + i,
-     startTime: startTime,
-     endTime: endTime,
-     allDay: true,
-     color: color,
-     etag: guid()
-     } );
-     } else {
-     startMinute = Math.floor( Math.random() * 24 * 60 );
-     endMinute = Math.floor( Math.random() * 180 ) + startMinute;
-     startTime = new Date( date.getFullYear(), date.getMonth(), date.getDate() + startDay, 0, date.getMinutes() + startMinute );
-     endTime = new Date( date.getFullYear(), date.getMonth(), date.getDate() + endDay, 0, date.getMinutes() + endMinute );
-     events.push( {
-     id: guid(),
-     etag: guid(),
-     summary: source + ' - Event ' + i,
-     startTime: startTime,
-     endTime: endTime,
-     allDay: false,
-     color: color
-     } );
-     }
-     }
-
-     events.push( {
-     id: guid(),
-     etag: guid(),
-     summary: source + ' - Event dentro do dia',
-     startTime: new Date(),
-     endTime: new Date(),
-     allDay: false,
-     color: color
-     } );
-     return events;
-     }*/
+    vm.loadAgendas().then( function() {
+        vm.loadEvents();
+    } );
 }
