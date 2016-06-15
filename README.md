@@ -13,7 +13,7 @@ Load [Ionic](http://ionicframework.com/) js and css dependent files. At the mome
 itself is not declared as a dependency in calendar package, so you need include it manually:
 
     <link rel="stylesheet" href="http://code.ionicframework.com/1.3.1/css/ionic.min.css"/>
-    <link rel="stylesheet" href="<bower lib installation path>/ionic-calendar/dist/css/calendar.min.css"/>
+    <script src="http://code.ionicframework.com/1.3.1/js/ionic.bundle.min.js"></script>
 
 Load application throught [systemjs](https://github.com/systemjs/systemjs) in main html file:
 
