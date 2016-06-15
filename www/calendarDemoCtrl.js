@@ -10,7 +10,7 @@ eventsService.$inject = [ '$http' ];
 appRun.$inject = [ '$ionicPlatform', '$animate' ];
 appConfig.$inject = [ '$stateProvider', '$urlRouterProvider' ];
 CalendarDemoController.$inject = [
-    '$log', 'eventsService', 'agendasService', '$ionicLoading'
+    '$window', '$log', 'eventsService', 'agendasService', '$ionicLoading'
 ];
 
 function agendasService( $http ) {
@@ -79,7 +79,7 @@ function appConfig( $stateProvider, $urlRouterProvider ) {
     $urlRouterProvider.otherwise( '/tab/home' );
 }
 
-function CalendarDemoController( $log, eventsService, agendasService, $ionicLoading ) {
+function CalendarDemoController( $window, $log, eventsService, agendasService, $ionicLoading ) {
     'use strict';
 
     var vm = this;
@@ -111,6 +111,7 @@ function CalendarDemoController( $log, eventsService, agendasService, $ionicLoad
     };
 
     vm.onEventSelected = function( event ) {
+        $window.open( event.htmlLink, '_blank' );
         $log.info( 'Event selected:' + event.startTime + '-' + event.endTime + ',' + event.title );
     };
 
