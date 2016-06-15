@@ -1,7 +1,6 @@
 angular.module( "ui.rCalendar.tpls", [ "src/calendar-tpls.html","src/month-day-tpls.html" ] );
 //todo: renomear eventos: titleChanged -> monthChanged  | timeSelected -> dateSelected
 //todo: aplicar tema material
-
 angular.module( 'ui.rCalendar', [ 'ui.rCalendar.tpls' ] );
 angular.module( 'ui.rCalendar' ).directive( 'calendar', function calendarDirective() {
     'use strict';
