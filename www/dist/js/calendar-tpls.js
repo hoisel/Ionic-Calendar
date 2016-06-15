@@ -92,7 +92,7 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
         step: { months: 1 }
     };
 
-    $scope.$parent.$watch( $attrs.eventSources, function( value ) {
+    $scope.$parent.$watchCollection( $attrs.eventSources, function( value ) {
         vm.onEventSourceChanged( value );
     } );
 

@@ -1,24 +1,32 @@
 # Ionic-Calendar directive
 
-Ionic calendar directive
+Ionic calendar directive with partial google calendar integration.
 
 ## Demo
 http://hoisel.github.io/Ionic-Calendar/www/
 
 ## Usage
 
-Bower Install: `bower install ionic-calendar`
+Jspm Install: `jspm install github:hoisel/ionic-calendar`
 
-Load the necessary dependent files:
+At the moment, load [Ionic](http://ionicframework.com/) js and css dependent files. Note that ionic
+itself is not declared as a dependency in calendar package, so you need include it manually:
 
     <link rel="stylesheet" href="http://code.ionicframework.com/1.3.1/css/ionic.min.css"/>
     <link rel="stylesheet" href="<bower lib installation path>/ionic-calendar/dist/css/calendar.min.css"/>
-    <script src="http://code.ionicframework.com/1.3.1/js/ionic.bundle.min.js"></script>
-    <script src="<bower lib installation path>/ionic-calendar/dist/js/calendar-tpls.min.js"></script>
 
-Add the calendar module as a dependency to your application module:
+Load application throught [systemjs](https://github.com/systemjs/systemjs) in main html file:
 
-    var myAppModule = angular.module('MyApp', ['ui.rCalendar'])
+     <script>
+       System.import('app/app').catch(console.error.bind(console));
+     </script>
+
+Import calendar module and css as a dependency of your application module:
+
+    import calendar from 'hoisel/ionic-calendar';
+    import 'hoisel/ionic-calendar/css/calendar.css!';
+
+    var myAppModule = angular.module('MyApp', [calendar])
 
 Add the directive in the html page
 
@@ -26,45 +34,56 @@ Add the directive in the html page
 
 ## Options
 
-* **formatDay**
+* **formatDay**<br/>
 The format of the date displayed in the month view.    
 Default value: 'dd'
-* **formatDayHeader**
+
+* **formatDayHeader**<br/>
 The format of the header displayed in the month view.    
 Default value: 'EEE'
-* **formatMonthTitle**
+
+* **formatMonthTitle**<br/>
 The format of the title displayed in the month view.    
 Default value: 'MMMM yyyy'
-* **formatHourColumn**
+
+* **formatHourColumn**<br/>
 The format of the hour column displayed in the week and day view.    
 Default value: 'ha'
-* **showEventDetail**
+
+* **showEventDetail**<br/>
 If set to true, when selecting the date in the month view, the events happened on that day will be shown below.    
 Default value: true
-* **startingDayMonth**
+
+* **startingDayMonth**<br/>
 Control month view starting from which day.    
 Default value: 0
+
 * **startingDayWeek**
 Control week view starting from which day.    
 Default value: 0
-* **allDayLabel**
+* **allDayLabel**<br/>
 The text displayed in the allDay column header.    
 Default value: ‘all day’
-* **noEventsLabel**
+
+* **noEventsLabel**<br/>
 The text displayed when there’s no event on the selected date in month view.    
 Default value: ‘No Events’
-* **eventSource**
+
+* **eventSource**<br/>
 The data source of the calendar, when the eventSource is set, the view will be updated accordingly.    
 Default value: null    
 The format of the eventSource is described in the EventSource section
-* **queryMode**
+
+* **queryMode**<br/>
 If queryMode is set to 'local', when the range or mode is changed, the calendar will use the already bound eventSource to update the view    
 If queryMode is set to 'remote', when the range or mode is changed, the calendar will trigger a callback function rangeChanged.    
 Users will need to implement their custom loading data logic in this function, and fill it into the eventSource. The eventSource is watched, so the view will be updated once the eventSource is changed.    
 Default value: 'local'
-* **step**
+
+* **step**<br/>
 It can be set to 15 or 30, so that the event can be displayed at more accurate position in weekview or dayview.
-* **rangeChanged**
+
+* **rangeChanged**<br/>
 The callback function triggered when the range or mode is changed if the queryMode is set to 'remote'
 
         $scope.rangeChanged = function (startTime, endTime) {
@@ -73,7 +92,7 @@ The callback function triggered when the range or mode is changed if the queryMo
             });
         };
 
-* eventSelected    
+* **eventSelected**<br/>
 The callback function triggered when an event is clicked
 
         <calendar ... event-selected="onEventSelected(event)"></calendar>
@@ -83,7 +102,7 @@ The callback function triggered when an event is clicked
             console.log(event.title);
         };
 
-* timeSelected    
+* **timeSelected**<br/>
 The callback function triggered when a date is selected in the monthview
 
         <calendar ... time-selected="onTimeSelected(selectedTime)"></calendar>
@@ -92,7 +111,7 @@ The callback function triggered when a date is selected in the monthview
             console.log(event.selectedTime);
         };
 
-* titleChanged    
+* **titleChanged**<br/>
 The callback function triggered when the view title is changed
 
         <calendar ... title-changed="onViewTitleChanged(title)”></calendar>
@@ -101,25 +120,68 @@ The callback function triggered when the view title is changed
             $scope.viewTitle = title;
         };
 
-## EventSource
+## EventSource model
 
 EventSource is an array of event object which contains at least below fields:
 
-* title
-* startTime    
+```json
+{
+  etag: String,
+  summary: String,
+  items: Array,
+  color: String
+}
+```
+
+* **etag**<br/>
+Event source identifier. Must be unique across all events.
+
+* **summary**<br/>
+Event source description.
+
+* **items**<br/>
+Event source events array.
+
+* **color**<br/>
+Event source display color. Must be a hexadecimal string like: '#fff', '#333', etc.
+
+
+
+## Event model
+```json
+{
+  id: String,
+  summary: String,
+  start:{
+    dateTime: String,
+    date: String
+  },
+  end:{
+    dateTime: String,
+    date: String
+  },
+  color: String
+}
+```
+* **id**<br/>
+Event identifier. Must be unique.
+
+* **summary**<br/>
+Event description.
+
+* **start.dateTime**<br/>
 If allDay is set to true, the startTime has to be as a UTC date which time is set to 0:00 AM, because in an allDay event, only the date is considered, the exact time or timezone doesn't matter.    
 For example, if an allDay event starting from 2014-05-09, then startTime is
 
         var startTime = new Date(Date.UTC(2014, 4, 8));
 
-* endTime    
+* **end.dateTime**<br/>
 If allDay is set to true, the startTime has to be as a UTC date which time is set to 0:00 AM, because in an allDay event, only the date is considered, the exact time or timezone doesn't matter.    
 For example, if an allDay event ending to 2014-05-10, then endTime is
 
         var endTime = new Date(Date.UTC(2014, 4, 9));
-
-* allDay    
-Indicates the event is allDay event or regular event
+* **color**<br/>
+Event display color
 
 **Note**
 In the current version, the calendar controller only watches for the eventSource reference as it's the least expensive.
