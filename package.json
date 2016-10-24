@@ -8,7 +8,16 @@
     "npm": ">=3.0.0"
   },
   "files": [ "www/dist" ],
-  "main": "www/dist/main",
+  "main": "www/dist/index.js",
+  "jspm": {
+    "directories": {
+      "lib": "www/dist"
+    },
+    "main": "index.js",
+    "format": "cjs",
+    "name": "hoisel/Ionic-Calendar",
+    "registry": "github"
+  },
   "devDependencies": {
     "eslint-config-prodest": "^1.0.12",
     "eslint-config-prodest-angular": "^1.0.2",
