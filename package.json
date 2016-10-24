@@ -1,6 +1,6 @@
 {
   "name": "ionic-calendar",
-  "version": "1.0.0-pre",
+  "version": "1.0.0",
   "private": false,
   "author": "Daniel Hoisel<danielhoiselferraz@gmail.com> (http://github.com/hoisel)",
   "engines": {
@@ -22,6 +22,10 @@
     "grunt-html2js": "^0.3.6",
     "grunt-string-replace": "^1.2.1"
   },
+  "peerDependencies": {
+    "angular": "^1.5.8",
+    "ionic-angular": "^1.3.1"
+  },
   "cordovaPlugins": [
     {
       "locator": "https://github.com/apache/cordova-plugin-whitelist.git",
@@ -30,14 +34,5 @@
   ],
   "cordovaPlatforms": [
     "android"
-  ],
-  "jspm": {
-    "directories": {
-      "lib": "www/dist"
-    },
-    "main": "index.js",
-    "format": "cjs",
-    "name": "hoisel/Ionic-Calendar",
-    "registry": "github"
-  }
+  ]
 }

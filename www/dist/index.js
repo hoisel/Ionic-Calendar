@@ -1,7 +1,5 @@
 // added to support jspm package manager import
-
-// Should already be required, here for clarity
-require( 'angular' );
+// Depends on angular and ionic as peer dependency
 require( './js/calendar-tpls' );
 
 // Export namespace
