@@ -1,12 +1,13 @@
 {
   "name": "ionic-calendar",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "author": "Daniel Hoisel<danielhoiselferraz@gmail.com> (http://github.com/hoisel)",
   "engines": {
     "node": ">=0.12.14",
     "npm": ">=3.0.0"
   },
+  "files": [ "www/dist" ],
   "devDependencies": {
     "eslint-config-prodest": "^1.0.12",
     "eslint-config-prodest-angular": "^1.0.2",
