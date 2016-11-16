@@ -1,5 +1,5 @@
 {
-  "name": "ionic-calendar",
+  "name": "@hoisel/ionic-calendar",
   "version": "1.0.5",
   "private": false,
   "author": "Daniel Hoisel<danielhoiselferraz@gmail.com> (http://github.com/hoisel)",
@@ -15,7 +15,7 @@
     },
     "main": "index.js",
     "format": "cjs",
-    "name": "hoisel/Ionic-Calendar",
+    "name": "@hoisel/ionic-calendar",
     "registry": "github"
   },
   "devDependencies": {
