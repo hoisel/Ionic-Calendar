@@ -3,6 +3,10 @@
   "version": "1.1.0",
   "private": false,
   "author": "Daniel Hoisel<danielhoiselferraz@gmail.com> (http://github.com/hoisel)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hoisel/ionic-calendar.git"
+  },
   "engines": {
     "node": ">=0.12.14",
     "npm": ">=3.0.0"
