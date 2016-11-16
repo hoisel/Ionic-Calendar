@@ -1,13 +1,15 @@
 {
   "name": "@hoisel/ionic-calendar",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "private": false,
   "author": "Daniel Hoisel<danielhoiselferraz@gmail.com> (http://github.com/hoisel)",
   "engines": {
     "node": ">=0.12.14",
     "npm": ">=3.0.0"
   },
-  "files": [ "www/dist" ],
+  "files": [
+    "www/dist"
+  ],
   "main": "www/dist/index.js",
   "jspm": {
     "directories": {
