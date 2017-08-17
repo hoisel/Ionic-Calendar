@@ -3,7 +3,7 @@
 Ionic calendar directive with partial google calendar integration.
 
 ## Demo
-http://hoisel.github.io/Ionic-Calendar/www/
+http://hoisel.github.io/ionic-calendar/www/
 
 ## Usage
 
