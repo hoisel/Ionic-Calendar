@@ -328,14 +328,10 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
 
     vm.getHighlightClass = function( date ) {
         var className = '';
-        /*
-         if ( date.hasEvent ) {
-         if ( date.secondary ) {
-         className = 'monthview-secondary-with-event';
-         } else {
-         className = 'monthview-primary-with-event';
-         }
-         }*/
+
+        if ( date.hasEvent ) {
+            className = 'monthview-has-event';
+        }
 
         if ( date.selected ) {
             if ( className ) {

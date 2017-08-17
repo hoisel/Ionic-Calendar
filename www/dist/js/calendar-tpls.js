@@ -329,14 +329,10 @@ function CalendarController( $scope, $attrs, $parse, $interpolate, $log, dateFil
 
     vm.getHighlightClass = function( date ) {
         var className = '';
-        /*
-         if ( date.hasEvent ) {
-         if ( date.secondary ) {
-         className = 'monthview-secondary-with-event';
-         } else {
-         className = 'monthview-primary-with-event';
-         }
-         }*/
+
+        if ( date.hasEvent ) {
+            className = 'monthview-has-event';
+        }
 
         if ( date.selected ) {
             if ( className ) {
@@ -646,7 +642,7 @@ angular.module( 'ui.rCalendar' ).directive( 'day', function monthDayDirective() 
 } );
 
 
-angular.module("src/calendar-tpls.html", []).run(["$templateCache", function($templateCache) {
+angular.module("src/calendar-tpls.html", []).run(["$templateCache", function ($templateCache) {
   $templateCache.put("src/calendar-tpls.html",
     "<div class=\"calendar-container\">\n" +
     "\n" +
@@ -996,7 +992,7 @@ angular.module("src/calendar-tpls.html", []).run(["$templateCache", function($te
     "</div>");
 }]);
 
-angular.module("src/month-day-tpls.html", []).run(["$templateCache", function($templateCache) {
+angular.module("src/month-day-tpls.html", []).run(["$templateCache", function ($templateCache) {
   $templateCache.put("src/month-day-tpls.html",
     "<td ng-click=\"onSelect()\"\n" +
     "	ng-class=\"getClasses()\">\n" +
