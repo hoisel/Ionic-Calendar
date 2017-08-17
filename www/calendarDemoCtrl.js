@@ -14,7 +14,7 @@ CalendarDemoController.$inject = [
 ];
 
 function agendasService( $http ) {
-    var urlBase = 'http://10.243.9.4/agendas';
+    var urlBase = 'https://api.es.gov.br/developers/calendars';
 
     this.getAll = function() {
         return $http.get( urlBase );
@@ -22,7 +22,7 @@ function agendasService( $http ) {
 }
 
 function eventsService( $http ) {
-    var urlBase = 'http://10.243.9.4/events';
+    var urlBase = 'https://api.es.gov.br/developers/calendars/events?calendars=INCAPER&calendars=SECULT&calendars=SEAG&calendars=SETUR&orderBy=startTime&singleEvents=true&timeMax=2017-12-31T02:00:00.000Z&timeMin=2017-01-01T02:00:00.000Z&timeZone=America/Sao_Paulo';
 
     this.getEventsFor = function( agendas, options ) {
         var hoje = new Date();
